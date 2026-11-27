@@ -30,7 +30,10 @@
   (function () {
     try {
       var t = localStorage.getItem("sb-theme");
-      if (!t) t = "dark";
+      // Anything that is not one of the two known values falls back to dark.
+      // A stale or corrupted entry used to leave data-theme set to garbage,
+      // which matches no palette and silently renders the light defaults.
+      if (t !== "light" && t !== "dark") t = "dark";
       document.documentElement.dataset.theme = t;
       document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "dark" ? "#0a0f1c" : "#faf8f4");
     } catch (e) {}

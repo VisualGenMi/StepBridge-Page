@@ -15,6 +15,7 @@
   const themeMeta = document.querySelector('meta[name="theme-color"]');
 
   function applyTheme(theme) {
+    if (theme !== "light" && theme !== "dark") theme = "dark";
     root.dataset.theme = theme;
     if (themeMeta) themeMeta.setAttribute("content", theme === "dark" ? "#0a0f1c" : "#faf8f4");
     if (themeBtn) {

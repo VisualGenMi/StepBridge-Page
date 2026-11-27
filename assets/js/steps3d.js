@@ -868,11 +868,22 @@
   /* sizing, theme, lifecycle                                             */
   /* ------------------------------------------------------------------ */
 
+  /* The page is laid out with CSS `zoom` (see --ui-zoom in style.css). A rect
+     measured inside a zoomed subtree is already in zoomed CSS pixels, but
+     devicePixelRatio does not account for CSS zoom, so using it directly would
+     under-sample the canvas and make the figure soft. Dividing by the zoom
+     restores one backing pixel per rendered pixel. */
+  function uiZoom() {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue("--ui-zoom");
+    const z = parseFloat(raw);
+    return z > 0.1 ? z : 1;
+  }
+
   function resize() {
     const rect = stage.getBoundingClientRect();
     W = Math.max(1, rect.width);
     H = Math.max(1, rect.height);
-    DPR = Math.min(2, window.devicePixelRatio || 1);
+    DPR = Math.min(2, (window.devicePixelRatio || 1) / uiZoom());
     canvas.width = Math.round(W * DPR);
     canvas.height = Math.round(H * DPR);
     cxp = W / 2;

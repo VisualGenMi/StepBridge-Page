@@ -5,9 +5,22 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-const [url, w, h, outfile, scrollSel = "", theme = "", jsCode = "", waitMs = "2000"] = process.argv.slice(2);
+// PowerShell drops empty-string arguments when invoking a native program, which
+// silently shifts every later positional argument (a theme of "dark" arrived as
+// "6000"). Pass "-" for "leave this empty" and it is normalised below.
+const raw = process.argv.slice(2);
+const clean = (v, dflt = "") => (v === undefined || v === "-" ? dflt : v);
+const [url, w, h, outfile] = raw;
+const scrollSel = clean(raw[4]);
+const theme = clean(raw[5]);
+const jsCode = clean(raw[6]);
+const waitMs = clean(raw[7], "2000");
 const width = Number(w), height = Number(h);
-const port = 9333;
+// An ephemeral port per run. A fixed port silently attaches to a Chrome left
+// over from an earlier run (or to any other app that grabbed it), which then
+// serves the wrong profile — a stale `sb-theme`, a stale viewport — and the
+// screenshot lies.
+const port = 9400 + Math.floor(Math.random() * 500);
 const profile = path.join(os.tmpdir(), "cdp-shot-" + Date.now());
 
 const chrome = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe";

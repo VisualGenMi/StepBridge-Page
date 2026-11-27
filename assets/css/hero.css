@@ -99,7 +99,13 @@
   font-family: var(--font-display);
   font-size: clamp(1.9rem, 2.9vw, 2.45rem);
   font-weight: 400;
+  /* line-height 1 keeps the lockup tight, but `background-clip: text` only
+     paints inside the padding box — with a 1em box the descenders of "g" and
+     "p" fall outside it and lose their fill. The padding extends the paint
+     area; the equal negative margin keeps the visual rhythm unchanged. */
   line-height: 1;
+  padding-bottom: 0.16em;
+  margin-bottom: -0.16em;
   letter-spacing: -0.022em;
   /* a narrow light band sweeps across otherwise solid ink */
   background-image: linear-gradient(

@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="StepBridge">
+  <!--
+    Animated StepBridge mark for README headers.
+
+    Declarative SMIL only (no script): GitHub strips <script> but keeps
+    <animate>, and SMIL still runs when the SVG is loaded through an <img> tag.
+
+    The loop plays the method itself, every 7 s:
+      1. two noise particles fade in              (sigma = 1)
+      2. step 1 draws itself - the steep rise
+      3. the elbow ring appears                   (the one intermediate state)
+      4. step 2 draws itself - the flat run
+      5. the endpoint lights up and pulses        (sigma = 0)
+      6. the dashed anchor chord fades in         (endpoint anchoring)
+
+    Every keyTimes list below starts at 0 and ends at 1 with strictly
+    increasing values; SMIL silently drops an animation otherwise.
+  -->
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#285FA6"/>
+      <stop offset="0.55" stop-color="#6A63A8"/>
+      <stop offset="1" stop-color="#B86B4B"/>
+    </linearGradient>
+    <linearGradient id="trail" x1="30" y1="92" x2="96" y2="50" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.8"/>
+      <stop offset="0.55" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#fff4ea"/>
+    </linearGradient>
+    <radialGradient id="glow">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="0.4" stop-color="#ffdcbe" stop-opacity="0.6"/>
+      <stop offset="1" stop-color="#ffc79a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="120" height="120" rx="26" fill="url(#tile)"/>
+
+  <!-- noise: two particles that never quite settle -->
+  <circle cx="26" cy="97" r="2.5" fill="#ffffff" opacity="0.5">
+    <animate attributeName="opacity" values="0;0.55;0.35;0.6;0.5;0" keyTimes="0;0.12;0.3;0.46;0.9;1" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="cy" values="97;94.5;97;94;97" dur="2.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="31" cy="90" r="1.8" fill="#ffffff" opacity="0.4">
+    <animate attributeName="opacity" values="0;0.42;0.28;0.45;0.4;0" keyTimes="0;0.14;0.32;0.48;0.9;1" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="cx" values="31;33;30.5;32;31" dur="3.1s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- the anchor chord: never a trajectory, only a constraint -->
+  <line x1="30" y1="92" x2="96" y2="50" stroke="#ffe7d2" stroke-width="1.7"
+        stroke-dasharray="3.4 4.2" stroke-linecap="round" opacity="0">
+    <animate attributeName="opacity" values="0;0;0.42;0.28;0.42;0" keyTimes="0;0.6;0.7;0.8;0.9;1" dur="7s" repeatCount="indefinite"/>
+  </line>
+
+  <!-- two steps: one steep rise, one flat run, drawn in two beats -->
+  <path d="M30 92 L56 60 L96 50" fill="none" stroke="url(#trail)" stroke-width="6.5"
+        stroke-linecap="round" stroke-linejoin="round"
+        stroke-dasharray="82" stroke-dashoffset="82">
+    <animate attributeName="stroke-dashoffset"
+             values="82;45;45;0;0;82;82"
+             keyTimes="0;0.26;0.36;0.5;0.94;0.95;1"
+             dur="7s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- the one retained intermediate state -->
+  <circle cx="56" cy="60" r="5.4" fill="#0b1220" stroke="#ffffff" stroke-width="2.6" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.24;0.3;0.92;0.94;1" dur="7s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- landing point: halo behind, bright core in front -->
+  <circle cx="96" cy="50" r="16" fill="url(#glow)" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;0.72;1;0;0" keyTimes="0;0.46;0.53;0.64;0.9;0.93;1" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="14;18;14" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="96" cy="50" r="5.2" fill="#ffffff" opacity="0">
+    <animate attributeName="opacity" values="0;0;1;0.9;1;0;0" keyTimes="0;0.46;0.53;0.64;0.86;0.9;1" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="r" values="5.2;6.1;5.2" dur="2.2s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- one expanding ring at the moment of landing -->
+  <circle cx="96" cy="50" r="6" fill="none" stroke="#ffffff" stroke-width="1.4" opacity="0">
+    <animate attributeName="r" values="6;19" keyTimes="0;1" dur="7s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0;0.5;0.2;0;0" keyTimes="0;0.5;0.53;0.7;0.88;1" dur="7s" repeatCount="indefinite"/>
+  </circle>
+</svg>

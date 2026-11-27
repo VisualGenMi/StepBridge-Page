@@ -171,7 +171,17 @@
 
       <p class="hero__sub reveal">
         <strong>StepBridge</strong> makes any few-step video student better by pairing on-policy trajectory
-        distillation with a frozen higher-step endpoint anchor &mdash; improving SMD, DMD, DMD2, ADV, and rCM
+        distillation with a frozen higher-step endpoint anchor &mdash; improving
+        <a class="ms" href="https://zjwfufu.github.io/SMD-Page/" target="_blank" rel="noopener"
+           title="SMD &middot; Simplifying and Improving On-Policy Distillation for Few-Step Diffusion">SMD</a>,
+        <a class="ms" href="https://arxiv.org/abs/2311.18828" target="_blank" rel="noopener"
+           title="DMD &middot; One-step Diffusion with Distribution Matching Distillation (CVPR 2024)">DMD</a>,
+        <a class="ms" href="https://tianweiy.github.io/dmd2/" target="_blank" rel="noopener"
+           title="DMD2 &middot; Improved Distribution Matching Distillation (NeurIPS 2024)">DMD2</a>,
+        <a class="ms" href="https://arxiv.org/abs/2311.17042" target="_blank" rel="noopener"
+           title="ADD &middot; Adversarial Diffusion Distillation (arXiv 2311.17042)">ADV</a>, and
+        <a class="ms" href="https://research.nvidia.com/labs/dir/rcm" target="_blank" rel="noopener"
+           title="rCM &middot; Large Scale Diffusion Distillation via Score-Regularized Continuous-Time Consistency (ICLR 2026)">rCM</a>
         at two sampling steps with <strong>zero extra inference cost</strong>.
       </p>
 
@@ -755,6 +765,21 @@
           <div class="delta__note">Recovers 76.4% of the gap; Dynamic Degree 0.7269 &rarr; 0.8056.</div>
         </div>
       </div>
+
+      <p class="baseline-note reveal">
+        <span class="baseline-note__k">Baselines</span>
+        <a class="ms" href="https://zjwfufu.github.io/SMD-Page/" target="_blank" rel="noopener"
+           title="SMD &middot; Simplifying and Improving On-Policy Distillation for Few-Step Diffusion">SMD</a>
+        <a class="ms" href="https://arxiv.org/abs/2311.18828" target="_blank" rel="noopener"
+           title="DMD &middot; One-step Diffusion with Distribution Matching Distillation (CVPR 2024)">DMD</a>
+        <a class="ms" href="https://tianweiy.github.io/dmd2/" target="_blank" rel="noopener"
+           title="DMD2 &middot; Improved Distribution Matching Distillation (Fast Image Synthesis, NeurIPS 2024)">DMD2</a>
+        <a class="ms" href="https://arxiv.org/abs/2311.17042" target="_blank" rel="noopener"
+           title="ADD &middot; Adversarial Diffusion Distillation (arXiv 2311.17042)">ADV</a>
+        <a class="ms" href="https://research.nvidia.com/labs/dir/rcm" target="_blank" rel="noopener"
+           title="rCM &middot; Large Scale Diffusion Distillation via Score-Regularized Continuous-Time Consistency (ICLR 2026)">rCM</a>
+        <span class="baseline-note__tail">each two-step student, trained by its original authors, is used as-is</span>
+      </p>
 
       <div class="recovery reveal">
         <div class="recovery__head">

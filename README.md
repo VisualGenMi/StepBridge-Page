@@ -234,7 +234,7 @@ python tools/make_og.py           # social preview card
 ### 🎬 The video wall
 
 <p align="center">
-  <img src="docs/video-wall.webp" width="100%" alt="Six side-by-side video comparisons playing at once">
+  <img src="docs/video-wall.webp" width="100%" alt="Six side-by-side video comparisons playing at once: the base two-step student on the left of each cell, its StepBridge counterpart on the right">
 </p>
 
 The wall sits in the **hero**, directly under the title, where a static teaser
@@ -434,16 +434,13 @@ Implementation: inline SVG on a 120 × 120 grid, ring text laid out with
 
 ### 📊 Results and analysis
 
-<table width="100%">
-<tr>
-<td width="50%" valign="top">
-  <img src="docs/results.webp" width="450" alt="Results section">
-</td>
-<td width="50%" valign="top">
-  <img src="docs/analysis.webp" width="450" alt="Analysis section">
-</td>
-</tr>
-</table>
+<p align="center">
+  <img src="docs/results.webp" width="100%" alt="Results section: five delta cards for SMD, DMD, DMD2, ADV and rCM">
+</p>
+
+<p align="center">
+  <img src="docs/analysis.webp" width="100%" alt="Analysis section: ablation table, ladder chart and pull quote">
+</p>
 
 The results section leads with **five delta cards** — SMD, DMD, DMD2, ADV, rCM —
 laid out as a centred 3 + 2 grid so the visual weight stays balanced at any

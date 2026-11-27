@@ -1,75 +1,135 @@
 <div align="center">
-
-<img src="assets/og.png" alt="StepBridge — Unifying Trajectory and Distribution Supervision for Efficient Two-Step Diffusion Generation" width="860">
+  <img src="docs/logo.svg" width="72" height="72" alt="StepBridge">
+  <h1>StepBridge · Project Page</h1>
+  <p><b>Unifying Trajectory and Distribution Supervision<br>for Efficient Two-Step Diffusion Generation</b></p>
+  <p>
+    <a href="https://visualgenmi.github.io/StepBridge-Page/"><img src="https://img.shields.io/badge/LIVE-Project%20Page-2f7d4f?style=for-the-badge&labelColor=0a0f1c&logo=githubpages&logoColor=white" alt="Live site"></a>
+    <a href="https://github.com/VisualGenMi/StepBridge"><img src="https://img.shields.io/badge/CODE-Repository-181717?style=for-the-badge&labelColor=0a0f1c&logo=github&logoColor=white" alt="Code"></a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/build-none%20required-2b6cb0?style=flat-square" alt="No build step">
+    <img src="https://img.shields.io/badge/stack-vanilla%20JS%20·%20Canvas%202D-c98a3f?style=flat-square" alt="Vanilla JS">
+    <img src="https://img.shields.io/badge/dependencies-0-4a4a8f?style=flat-square" alt="Zero dependencies">
+    <img src="https://img.shields.io/badge/QA-38%20checks%20passing-2f7d4f?style=flat-square" alt="QA">
+    <img src="https://img.shields.io/badge/license-figures%20©%20authors-9aa4b8?style=flat-square" alt="License">
+  </p>
+  <p><i>A single-page, dependency-free project site — open <code>index.html</code> and it runs.<br>No framework, no bundler, no server-side code.</i></p>
+</div>
 
 <br>
 
-# StepBridge · Project Page
-
-**Unifying Trajectory and Distribution Supervision for Efficient Two-Step Diffusion Generation**
-
-[![Live site](https://img.shields.io/badge/live-visualgenmi.github.io-2f7d4f?style=flat-square&logo=githubpages&logoColor=white)](https://visualgenmi.github.io/StepBridge-Page/)
-[![Code](https://img.shields.io/badge/code-StepBridge-181717?style=flat-square&logo=github&logoColor=white)](https://github.com/VisualGenMi/StepBridge)
-[![No build step](https://img.shields.io/badge/build-none%20required-2b6cb0?style=flat-square)](#local-preview)
-[![Vanilla JS](https://img.shields.io/badge/stack-vanilla%20JS%20%C2%B7%20Canvas%202D-c98a3f?style=flat-square)](#repository-layout)
-[![Checks](https://img.shields.io/badge/QA-38%20checks%20passing-4a4a8f?style=flat-square)](#automated-checks)
-
-A single-page, dependency-free project site for a two-step video diffusion paper.
-Open `index.html` and it runs — no framework, no bundler, no server-side code.
-
-</div>
+<p align="center">
+  <img src="docs/hero.webp" width="100%" alt="StepBridge project page, hero section">
+</p>
 
 ---
 
-## Contents
+## Table of contents
 
-- [Highlights](#highlights)
-- [Local preview](#local-preview)
+<table>
+<tr>
+<td valign="top" width="50%">
+
+**Getting started**
+- [What this is](#what-this-is)
+- [Quick start](#quick-start)
+- [Deep links](#deep-links-for-screenshots)
+
+**Ship it**
 - [Deployment](#deployment)
+- [Adding collaborators](#adding-collaborators)
+
+</td>
+<td valign="top" width="50%">
+
+**Work on it**
 - [Repository layout](#repository-layout)
 - [What to edit](#what-to-edit)
-- [Design notes · the video wall](#design-notes--the-video-wall)
-- [Design notes · the two 3D figures](#design-notes--the-two-3d-figures)
-- [Design notes · the emblem](#design-notes--the-emblem)
-- [Design notes · the abstract flowchart](#design-notes--the-abstract-flowchart)
-- [Engineering notes](#engineering-notes)
+- [Rebuilding assets](#rebuilding-assets)
+
+**Understand it**
+- [Design notes](#design-notes)
 - [Automated checks](#automated-checks)
 - [Credits](#credits)
 
+</td>
+</tr>
+</table>
+
 ---
 
-## Highlights
+## What this is
+
+A project page for a paper on two-step video diffusion. It is one static HTML
+file plus hand-written CSS and JavaScript, with two custom 3D figures drawn
+directly into `<canvas>` and a fifteen-clip comparison wall in the hero.
+
+<table>
+<tr>
+<td width="33%" valign="top">
+
+### 🎬 Video wall
+Six side-by-side comparisons at once, uncropped, auto-advancing in three sets.
+
+</td>
+<td width="33%" valign="top">
+
+### 🌐 3D figures
+A step-compression corridor and a three-rail distillation diagram, both in
+Canvas 2D — no WebGL, no three.js.
+
+</td>
+<td width="33%" valign="top">
+
+### ⚡ Zero tooling
+No `npm install`, no build step, no framework. Edit the file, refresh.
+
+</td>
+</tr>
+</table>
+
+<table>
+<tr>
+<td width="50%">
 
 | | |
 | --- | --- |
 | **Live site** | <https://visualgenmi.github.io/StepBridge-Page/> |
-| **Paper** | Not published yet — the only PDF in hand is the anonymous review version, which carries a *confidential* header on every page and is therefore kept out of this repository |
-| **Code** | <https://github.com/VisualGenMi/StepBridge> (being prepared for release) |
-| **Video wall** | 15 side-by-side comparisons, six on screen at once, uncropped |
-| **3D figures** | Two hand-written Canvas 2D scenes — no WebGL, no three.js |
-| **Payload** | ~50 MB of video, everything else under 500 KB |
+| **Code** | <https://github.com/VisualGenMi/StepBridge> |
+| **Payload** | ~50 MB video, < 600 KB everything else |
+| **Hosting** | GitHub Pages, `main` branch root |
+
+</td>
+<td width="50%">
+
+> **Paper.** Not published here yet. The only PDF in hand is the anonymous
+> review version, which carries a *confidential* header on every page, so it is
+> deliberately kept out of this repository (see `.gitignore`).
+> The hero button reads **Paper · Soon** until a public version exists.
+
+</td>
+</tr>
+</table>
 
 ---
 
-## Local preview
-
-Any static server works. Python is the shortest path:
+## Quick start
 
 ```powershell
 cd StepBridge-Page
 python -m http.server 8899 --bind 127.0.0.1
-# then open http://127.0.0.1:8899/
+# → http://127.0.0.1:8899/
 ```
 
-On Windows you can also just double-click `serve.cmd`.
+On Windows, `serve.cmd` does the same thing in one double-click.
 
-> Opening `index.html` straight from the filesystem mostly works, but the JSON
-> playlist and the video range requests behave better over `http://`.
+> Opening `index.html` directly from disk mostly works, but the JSON playlist and
+> video range requests behave better over `http://`.
 
 ### Deep links for screenshots
 
-The page accepts URL parameters. They exist so that a specific frame can be
-reproduced and shared, which is handy when sending a figure to a co-author.
+The page accepts URL parameters so that a specific frame can be reproduced and
+shared — useful when sending a figure to a co-author.
 
 | Parameter | Effect |
 | --- | --- |
@@ -77,16 +137,15 @@ reproduced and shared, which is handy when sending a figure to a co-author.
 | `?steps=2` | Pin the step-compression corridor on the two-step stage |
 | `?arch=0.55` | Freeze the architecture timeline at 55 % (any value in `0`–`1`) |
 
+Example: <https://visualgenmi.github.io/StepBridge-Page/?arch=0.62&theme=dark>
+
 ---
 
 ## Deployment
 
-The site is served by **GitHub Pages** from the `main` branch, repository root.
-
-### Publishing an update
+Served by **GitHub Pages** from the `main` branch, repository root.
 
 ```powershell
-cd StepBridge-Page
 git add -A
 git commit -m "update: what changed"
 git push
@@ -94,7 +153,10 @@ git push
 
 Pages rebuilds automatically; the new version is live in about a minute.
 
-### First-time setup (already done here)
+<details>
+<summary><b>First-time setup</b> (already done for this repository)</summary>
+
+<br>
 
 1. Create the repository under the organisation.
 2. `git remote add origin https://github.com/VisualGenMi/StepBridge-Page.git`
@@ -103,20 +165,21 @@ Pages rebuilds automatically; the new version is live in about a minute.
 
 The free organisation plan only serves Pages from **public** repositories, which
 is why this repository is public while the code repository stays separate.
+`.nojekyll` sits in the root so Jekyll does not reinterpret `assets/`.
 
-`.nojekyll` sits in the root so that Jekyll does not reinterpret `assets/`.
+</details>
 
 ### Adding collaborators
 
-Organisation → **People → Invite member** (role *Member* to push, *Owner* to
-change settings). Every repository in the organisation then inherits access,
-which is simpler than adding collaborators one repository at a time.
+Organisation → **People → Invite member** — role *Member* to push, *Owner* to
+change settings. Every repository in the organisation inherits the access, which
+is simpler than adding collaborators one repository at a time.
 
 ### Alternatives
 
 | Option | How |
 | --- | --- |
-| No Git client | Upload `index.html` + `assets/` through **Add file → Upload files** |
+| No Git client | Upload `index.html` + `assets/` via **Add file → Upload files** |
 | Drag and drop | Drop the folder on <https://app.netlify.com/drop> |
 | Custom domain | Pages → Custom domain, plus a `CNAME` file in the root |
 
@@ -129,6 +192,7 @@ StepBridge-Page/
 ├── index.html                 # the whole page: hero, 7 sections, JSON playlist
 ├── serve.cmd                  # one-click local server on Windows
 ├── .nojekyll                  # keep Jekyll out of assets/
+├── docs/                      # screenshots used by this README
 ├── assets/
 │   ├── css/style.css          # base layout, hero, 3D containers, authors, role cards
 │   ├── css/cinema.css         # the comparison wall
@@ -161,8 +225,8 @@ StepBridge-Page/
 
 ## What to edit
 
-Everything a reader sees lives in `index.html`. The table below points at the
-blocks that change most often.
+Everything a reader sees lives in `index.html`. These are the blocks that change
+most often.
 
 | Content | Where |
 | --- | --- |
@@ -188,10 +252,18 @@ python tools/make_og.py           # social preview card
 
 ---
 
-## Design notes · the video wall
+## Design notes
 
-The video wall sits in the **hero**, directly under the title, where a static
-teaser figure used to be. For a video paper the first screen should move.
+<br>
+
+### 🎬 The video wall
+
+<p align="center">
+  <img src="docs/video-wall.webp" width="100%" alt="Six side-by-side video comparisons playing at once">
+</p>
+
+The wall sits in the **hero**, directly under the title, where a static teaser
+figure used to be. For a video paper the first screen should move.
 
 **What it does**
 
@@ -205,36 +277,47 @@ teaser figure used to be. For a video paper the first screen should move.
   mat, with the baked title row kept at its original brightness.
 - The card footer carries only `title + model + method`; the expand button
   appears on hover and opens a full-size lightbox.
-- Copy is compressed into one status line:
-  `Same prompt, same seed · left: base two-step · right: + StepBridge · click any pair to enlarge`
-  with a progress bar for the current set on the right.
 - Responsive: 2 columns below 1100 px, a single column below 700 px, and on
-  phones a *set* is 2 clips rather than 6 so the abstract does not get pushed
-  several screens down.
+  phones a *set* is 2 clips rather than 6 so the abstract is not pushed several
+  screens down.
 - Plays only while visible, pauses in background tabs, and under
   `prefers-reduced-motion` it shows the first frame and stops advancing.
 
-**Two traps worth remembering**
+<details>
+<summary><b>Two traps worth remembering</b></summary>
 
-1. **Never overlay the baked title row.** An earlier build added a dark
-   gradient scrim over the top 15 % of each cell to calm the white bars down.
-   The baked bar is ~13 % of the frame, so the scrim landed exactly on it and
-   turned crisp dark text into grey mush — it read as two layers stacked on top
-   of each other. The scrim is gone; the bar keeps its own contrast.
+<br>
 
-2. **Bump the cache version when assets change in place.** Videos are
-   re-encoded under the same filenames, so browsers happily keep serving the
-   old bytes. `cinema.js` appends `?v=…` to video and poster URLs, and
-   `index.html` version-tags its CSS/JS. Increment both when replacing media.
+**1 · Never overlay the baked title row.**
+An earlier build added a dark gradient scrim over the top 15 % of each cell to
+calm the white bars down. The baked bar is ~13 % of the frame, so the scrim
+landed exactly on it and turned crisp dark text into grey mush — it read as two
+layers stacked on top of each other. The scrim is gone; the bar keeps its own
+contrast.
 
----
+**2 · Bump the cache version when assets change in place.**
+Videos are re-encoded under the same filenames, so browsers happily keep serving
+the old bytes. `cinema.js` appends `?v=…` to video and poster URLs, and
+`index.html` version-tags its CSS/JS. Increment both when replacing media.
 
-## Design notes · the two 3D figures
+</details>
+
+<br>
+
+### 🌐 The two 3D figures
+
+<p align="center">
+  <img src="docs/method.webp" width="100%" alt="Step-compression corridor above, three-rail architecture below">
+</p>
 
 Both figures are drawn by hand into a `<canvas>` with a small perspective
-projection (`s = focal / (dist − z)`). There is no WebGL and no 3D library.
+projection, `s = focal / (dist − z)`. There is no WebGL and no 3D library.
 
-### Step compression (`assets/js/steps3d.js`)
+<table>
+<tr>
+<td width="50%" valign="top">
+
+#### `steps3d.js` — step compression
 
 A corridor threading the latent space. Each ring is one network evaluation:
 50 dense rings for the teacher, 4 for the reference, 2 for the student — where
@@ -242,14 +325,25 @@ two rings also raise a dashed arch to mark the endpoint anchor. The
 `50 ⟶ 4 ⟹ 2` strip below doubles as a legend and a stage selector (clicking
 pins a stage for 14 s; arrow keys work too).
 
-### Three-rail architecture (`assets/js/arch3d.js`)
+</td>
+<td width="50%" valign="top">
 
-Four questions were answered before any pixel was drawn:
+#### `arch3d.js` — three rails
+
+Three models on one clock: the 50-step teacher, the two-step student, and the
+frozen four-step reference. Four questions were answered before any pixel was
+drawn — input, trajectory alignment, distribution alignment, output.
+
+</td>
+</tr>
+</table>
+
+**The four questions behind the architecture figure**
 
 | | Content | How it is drawn |
 | --- | --- | --- |
 | Input | prompt `c` plus two **independently sampled** noises `z_S, z_A` | two jittering particle clusters at the left end; a bowed arrow labelled `4-step ckpt` links the reference start to the student start |
-| Alignment ① (trajectory, **two-way**) | the student proposes **key states**; the teacher returns the **velocity there** | violet dashed beam upward (student → teacher, arrowhead at the teacher), solid blue beam downward (teacher → student, arrowhead on the student), bowed in opposite directions so the loop is legible |
+| Alignment ① (trajectory, **two-way**) | the student proposes **key states**; the teacher returns the **velocity there** | violet dashed beam upward, solid blue beam downward, bowed in opposite directions so the loop is legible |
 | Alignment ② (distribution) | `p_θ → p_A` with **no sample correspondence** | endpoints open into sample clouds, linked by **shuffled** pair lines; after anchoring the violet cloud settles onto the warm one |
 | Output | `x̂ = G_θ(z_S, c)` at 2 NFE | a single point at the end of the student rail, labelled `x̂ / 2 NFE`; only the student rail is a solid ribbon |
 
@@ -276,23 +370,52 @@ same `u`, the σ = 1 → 0 progress. The student crosses in **two big strides**
 while the reference moves almost uniformly: same elapsed time, same path,
 different step counts.
 
-**Beat of the loop.** Noise inputs and the `4-step ckpt` flash → first stride,
-windows open, both beams fire → second stride repeats → both rails reach σ = 0
-together → clouds open, anchor band lights, clouds converge → repeat.
-
 **Perspective floor.** A grid under the rails — lines parallel to the rails plus
 cross lines converging on the vanishing point — fades with depth, with a soft
-pool of light in the middle. It gives the three rails a ground plane instead of
+pool of light in the middle. It gives the rails a ground plane instead of
 floating them on black.
 
-**Caption.** One paragraph, `Top:` for steps and gates, `Bottom:` for interval
-windows and two-way supervision. Justified with a flush-left last line on
-desktop, and switched back to left-aligned below 700 px where justification
-opens ugly word gaps.
+<br>
 
----
+### 🧭 The abstract flowchart
 
-## Design notes · the emblem
+<table>
+<tr>
+<td width="52%" valign="top">
+  <img src="docs/abstract.webp" alt="Abstract reading-guide flowchart">
+</td>
+<td width="48%" valign="top">
+
+The right column of the abstract used to be empty. It now holds a vertical
+flowchart that translates the abstract, sentence by sentence, into four stages:
+
+| Stage | Abstract sentence it mirrors |
+| --- | --- |
+| ① The constraint | "…under a severely limited sampling budget" |
+| ② Multi-step teacher / few-step generator | "…may not fully align with the student's compressed sampling process" |
+| ③ StepBridge | "…combine trajectory-level and distribution-level supervision" |
+| ④ Coordination | "…adaptive gradient scaling and asymmetric gradient projection" |
+
+The same ① ② ③ ④ marks are embedded as small dots in the abstract prose.
+Hovering a dot lights the matching card; clicking scrolls it into view and
+pulses it. Wires are animated dashed SVG paths, static under
+`prefers-reduced-motion`.
+
+The column is `position: sticky`, so it stays visible while the abstract
+scrolls. Below 980 px it collapses to a single column and moves **above** the
+abstract, so readers see the diagram before the text.
+
+</td>
+</tr>
+</table>
+
+<br>
+
+### 🏅 The emblem
+
+<p align="center">
+  <img src="docs/logo.svg" width="88" alt="StepBridge emblem">
+</p>
 
 One sentence: **a rise plus a flat run = two steps; a dashed chord = endpoint
 anchoring.**
@@ -301,14 +424,17 @@ anchoring.**
 | --- | --- |
 | A few scattered dots at the left | Gaussian noise (σ = 1), not yet formed |
 | A steep blue segment | Step 1: crossing most of the trajectory |
-| A small ring at the elbow | The only retained intermediate state (two steps have one) |
+| A small ring at the elbow | The only retained intermediate state |
 | A warm horizontal run | Step 2: from the intermediate state to the endpoint |
 | A thin dashed chord | Endpoint anchoring: the landing constraint from the frozen four-step reference |
 | A glowing dot at the right | Clean latent (σ = 0) |
 | Orbiting ring text | `TWO-STEP · TRAJECTORY + DISTRIBUTION` |
 | Blue → violet → warm gradient | The same palette as the body text, 3D figures and table highlights |
 
-Hard rules that came out of the iterations:
+<details>
+<summary><b>Hard rules that came out of the iterations</b></summary>
+
+<br>
 
 1. **Exactly two segments.** Never a W-shape with three or four strides — that
    would silently contradict the "two-step" claim.
@@ -322,39 +448,46 @@ Hard rules that came out of the iterations:
 
 Where it appears: the 100 px emblem in the hero, a 40 × 40 simplified version in
 the navigation bar, and the same mark in the favicon and `assets/og.png`.
+Implementation: inline SVG on a 120 × 120 grid, ring text laid out with
+`<textPath>` and rotated once per 44 s, polyline drawn in with
+`stroke-dasharray` over 2.6 s, endpoint glow via radial gradient and a breathing
+`scale`. Everything stops under `prefers-reduced-motion`.
 
-Implementation: inline SVG on a 120 × 120 grid, no image dependency. Ring text
-is laid out with `<textPath>` and rotated once per 44 s; the polyline draws
-itself in with `stroke-dasharray` over 2.6 s; the endpoint glow uses a radial
-gradient and a breathing `scale`; noise dots blink out of phase. All of it stops
-under `prefers-reduced-motion`.
+</details>
 
----
+<br>
 
-## Design notes · the abstract flowchart
+### 📊 Results and analysis
 
-The right column of the abstract used to be empty. It now holds a vertical
-flowchart that translates the abstract, sentence by sentence, into four stages:
+<table>
+<tr>
+<td width="50%" valign="top">
+  <img src="docs/results.webp" alt="Results section">
+</td>
+<td width="50%" valign="top">
+  <img src="docs/analysis.webp" alt="Analysis section">
+</td>
+</tr>
+</table>
 
-| Stage | Abstract sentence it mirrors |
-| --- | --- |
-| ① The constraint | "…under a severely limited sampling budget" |
-| ② Multi-step teacher / few-step generator | "…may not fully align with the student's compressed sampling process" / "…lacks explicit guidance on the student's generation trajectory" |
-| ③ StepBridge | "…combine trajectory-level and distribution-level supervision", with `L_OPD` and `L_DMD` listed |
-| ④ Coordination | "…adaptive gradient scaling and asymmetric gradient projection" |
+The results section leads with **five delta cards** — SMD, DMD, DMD2, ADV, rCM —
+laid out as a centred 3 + 2 grid so the visual weight stays balanced at any
+width. Below them, a gap-recovery bar chart shows what share of the two-step →
+four-step gap each setting recovers, with anything above the 100 % line meaning
+the two-step student overtook its own four-step reference.
 
-The same ① ② ③ ④ marks are embedded as small dots in the abstract prose.
-Hovering or focusing a dot lights the matching card; clicking scrolls the card
-into view and pulses it. Wires are animated dashed SVG paths, static under
-`prefers-reduced-motion`.
-
-The column is `position: sticky`, so it stays visible while the abstract
-scrolls. Below 980 px it collapses to a single column and moves **above** the
-abstract, so readers see the diagram before the text.
+The analysis section pairs prose with a pull quote that stays **dark in both
+themes**: `--ink` flips to near-white in dark mode, which once turned that card
+white and left the light body text unreadable.
 
 ---
 
 ## Engineering notes
+
+<details>
+<summary><b>Palette, type and layout decisions</b></summary>
+
+<br>
 
 - **Palette** comes from the paper: `#285FA6` (bridge blue), `#6A63A8`
   (transition violet), `#B86B4B` (bridge warm). Table highlights reuse the
@@ -362,15 +495,19 @@ abstract, so readers see the diagram before the text.
 - **Type**: Instrument Serif for display, Inter for body, JetBrains Mono for
   code, with Georgia and the system stack as offline fallbacks.
 - **The abstract** is justified and capped at 70 ch to keep line lengths
-  readable.
+  readable; below 700 px justification is dropped because narrow columns open
+  ugly word gaps.
 - **Paper Figure 2** is a white-background illustration, so it is wrapped in a
-  "sheet of paper" card (warm off-white, click to enlarge) rather than pasted
-  as a raw image.
-- **The formula card** stays dark in both themes so the contrast never breaks.
+  "sheet of paper" card (warm off-white, click to enlarge) rather than pasted as
+  a raw image.
 - **Both 3D canvases** use palette-independent colours, so switching themes
   needs no re-render logic.
-- **Initial paint** loads fonts plus a single image; videos and posters are
-  lazy and only start when the wall scrolls into view.
+- **Initial paint** loads fonts plus a single image; videos and posters are lazy
+  and only start when the wall scrolls into view.
+- **The comparison wall and both canvases** are `IntersectionObserver`-driven:
+  off-screen work stops rather than draining battery.
+
+</details>
 
 ---
 
@@ -380,7 +517,6 @@ The QA scripts drive a real Chrome over the DevTools protocol, so they catch
 layout and runtime problems that a static lint cannot.
 
 ```powershell
-npm i puppeteer-core          # or use any local Chrome
 node tools/qa.mjs https://visualgenmi.github.io/StepBridge-Page/
 node tools/test-steps.mjs http://127.0.0.1:8899/
 node tools/test-perf.mjs  http://127.0.0.1:8899/
@@ -388,13 +524,12 @@ node tools/test-perf.mjs  http://127.0.0.1:8899/
 
 | Suite | Covers |
 | --- | --- |
-| `qa.mjs` — 38 checks | title, playlist, wall layout and autoplay, paging, tables, theme, lightboxes, anchors, console errors, asset 200s, overflow at 1440 px and 390 px, mobile menu |
-| `test-steps.mjs` — 10 checks | stage cycling, `?steps=` deep link, HUD numbers, canvas painting |
+| `qa.mjs` — **38 checks** | title, playlist, wall layout and autoplay, paging, tables, theme, lightboxes, anchors, console errors, asset 200s, overflow at 1440 px and 390 px, mobile menu |
+| `test-steps.mjs` — **10 checks** | stage cycling, `?steps=` deep link, HUD numbers, canvas painting |
 | `test-perf.mjs` | animation frame-rate under load, `prefers-reduced-motion` behaviour |
 
-`tools/shot.mjs <url> <w> <h> <out.png> <selector> <theme> <scrollTo> <waitMs>`
-captures a single element, which is how the figures in this repository were
-reviewed.
+`tools/shot.mjs <url> <w> <h> <out> <selector> <theme> <scroll> <wait>`
+captures a single element — this is how every screenshot in `docs/` was made.
 
 ---
 
@@ -407,3 +542,13 @@ reviewed.
   (left) with its StepBridge counterpart (right) under identical prompt and seed.
 - Figures and videos remain © the paper's authors. The page code is free to
   reuse.
+
+<br>
+
+<div align="center">
+  <sub>MiLM Plus, Xiaomi Inc. · School of Computer Science, Wuhan University</sub>
+  <br><br>
+  <a href="https://visualgenmi.github.io/StepBridge-Page/">Project page</a> ·
+  <a href="https://github.com/VisualGenMi/StepBridge">Code</a> ·
+  <a href="https://github.com/VisualGenMi">Organisation</a>
+</div>

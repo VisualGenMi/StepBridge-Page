@@ -1,0 +1,8 @@
+﻿# local preview / tooling
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# the review-version PDF is not published
+assets/pdf/

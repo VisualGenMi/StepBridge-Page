@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StepBridge — Unifying Trajectory and Distribution Supervision for Efficient Two-Step Diffusion Generation</title>
+<meta name="description" content="StepBridge bridges on-policy trajectory distillation with higher-step endpoint anchoring, improving two-step video generation for SMD, DMD, and DMD2 without any extra inference cost.">
+<meta name="theme-color" content="#0a0f1c">
+<meta property="og:type" content="website">
+<meta property="og:title" content="StepBridge — Two-Step Diffusion Generation">
+<meta property="og:description" content="Trajectory + distribution supervision for two-step video generation. +2.15 VBench Total on SMD, 83.78 best two-step score, 2 NFE at 1.84 s.">
+<meta property="og:url" content="https://visualgenmi.github.io/StepBridge-Page/">
+  <link rel="canonical" href="https://visualgenmi.github.io/StepBridge-Page/">
+  <meta property="og:image" content="https://visualgenmi.github.io/StepBridge-Page/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://visualgenmi.github.io/StepBridge-Page/assets/og.png">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;family=Instrument+Serif:ital@0;1&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css?v=2">
+<link rel="stylesheet" href="assets/css/cinema.css?v=2">
+<link rel="stylesheet" href="assets/css/results.css?v=2">
+<link rel="stylesheet" href="assets/css/flow.css?v=2">
+<link rel="stylesheet" href="assets/css/hero.css?v=2">
+<script>
+  // Apply the saved theme before paint to avoid a flash.
+  (function () {
+    try {
+      var t = localStorage.getItem("sb-theme");
+      if (!t) t = "dark";
+      document.documentElement.dataset.theme = t;
+      document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "dark" ? "#0a0f1c" : "#faf8f4");
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header" id="header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="StepBridge home">
+      <span class="brand__mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 32 20 17.5H34" stroke-width="3.2"/>
+          <circle cx="34" cy="17.5" r="2.4" fill="#fff" stroke="none"/>
+        </svg>
+      </span>
+      <span>StepBridge</span>
+      <span class="brand__sub">2027</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Primary">
+      <a href="#videos">Videos</a>
+      <a href="#method">Method</a>
+      <a href="#abstract">Abstract</a>
+      <a href="#results">Results</a>
+      <a href="#analysis">Analysis</a>
+      <a href="#citation">Cite</a>
+    </nav>
+
+    <div class="nav__actions">
+      <a class="icon-btn" href="https://github.com/VisualGenMi/StepBridge" target="_blank" rel="noopener"
+         aria-label="Open the code repository" title="Code on GitHub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+      </a>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+      <button class="icon-btn nav__toggle" id="navToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navDrawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <div class="nav__drawer" id="navDrawer">
+    <a href="#videos">Videos</a>
+    <a href="#method">Method</a>
+    <a href="#abstract">Abstract</a>
+    <a href="#results">Results</a>
+    <a href="#analysis">Analysis</a>
+    <a href="#citation">Cite</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- ============================== HERO ============================== -->
+  <section class="hero" id="top">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__grid" aria-hidden="true"></div>
+    <svg class="hero__bridge" viewBox="0 0 1500 300" fill="none" aria-hidden="true">
+      <g stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+        <path d="M0 236h1500" opacity=".55"/>
+        <path d="M0 252h1500" opacity=".22"/>
+        <path d="M0 208c76-52 268-104 380-108" opacity=".5"/>
+        <path d="M380 100c240 130 500 130 740 0" opacity=".65"/>
+        <path d="M1120 100c112 4 304 56 380 108" opacity=".5"/>
+        <path d="M300 236V100M380 236V100M1120 236V100M1200 236V100" opacity=".35"/>
+        <path d="M300 132h80M1120 132h80" opacity=".35"/>
+        <path d="M410 236V168M446 236V192M482 236V208M518 236V218M554 236V224M590 236V227" opacity=".3"/>
+        <path d="M910 236V227M946 236V224M982 236V218M1018 236V208M1054 236V192M1090 236V168" opacity=".3"/>
+        <path d="M718 236v-9M750 236v-12M782 236v-9" opacity=".3"/>
+      </g>
+    </svg>
+
+    <div class="wrap hero__inner">
+      <div class="hero__lockup reveal">
+        <div class="emblem" aria-hidden="true">
+          <svg class="emblem__svg" viewBox="0 0 120 120" role="presentation">
+            <defs>
+              <linearGradient id="emblemGrad" x1="30" y1="84" x2="90" y2="48" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#4f8fdc"/>
+                <stop offset="0.5" stop-color="#8f7fdd"/>
+                <stop offset="1" stop-color="#e2a07c"/>
+              </linearGradient>
+              <radialGradient id="emblemGlow" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stop-color="#ffd9c2" stop-opacity=".95"/>
+                <stop offset="0.45" stop-color="#e2a07c" stop-opacity=".45"/>
+                <stop offset="1" stop-color="#e2a07c" stop-opacity="0"/>
+              </radialGradient>
+              <path id="emblemRing" d="M60,60 m-49,0 a49,49 0 1,1 98,0 a49,49 0 1,1 -98,0"/>
+            </defs>
+
+            <g class="emblem__orbit">
+              <circle cx="60" cy="60" r="49" fill="none" stroke="currentColor" stroke-opacity=".16" stroke-width="0.8"/>
+              <text class="emblem__ring-text">
+                <textPath href="#emblemRing" startOffset="0%">
+                  TWO-STEP &#183; TRAJECTORY + DISTRIBUTION &#183;
+                </textPath>
+              </text>
+            </g>
+
+            <!-- anchor deck: the direct chord the student must land on -->
+            <path class="emblem__deck" d="M33 81 87 51" fill="none" stroke="#e2a07c" stroke-width="1.5"
+                  stroke-linecap="round" stroke-dasharray="5 4.5" opacity=".75"/>
+
+            <!-- exactly two steps: one riser, one tread -->
+            <path class="emblem__steps" d="M33 81 58 51H87" fill="none" stroke="url(#emblemGrad)"
+                  stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="58" cy="51" r="4.4" fill="#0a0f1c" stroke="url(#emblemGrad)" stroke-width="2.4"/>
+            <circle cx="58" cy="51" r="1.4" fill="#e6edf9"/>
+
+            <!-- noisy start -->
+            <g class="emblem__noise" fill="#7ea8e0">
+              <circle cx="24" cy="72" r="1.8" opacity=".8"/>
+              <circle cx="27" cy="86" r="1.3" opacity=".5"/>
+              <circle cx="36" cy="90" r="1" opacity=".35"/>
+            </g>
+
+            <!-- clean endpoint -->
+            <circle class="emblem__end" cx="87" cy="51" r="8" fill="url(#emblemGlow)"/>
+            <circle cx="87" cy="51" r="3.2" fill="#fff1e8"/>
+          </svg>
+        </div>
+
+        <p class="wordmark">StepBridge</p>
+
+        <div class="venue-pill">
+          <b>Project page</b>
+          <span class="dot" aria-hidden="true"></span>
+          <span>2027</span>
+        </div>
+      </div>
+
+      <h1 class="reveal">Unifying Trajectory and Distribution Supervision for Efficient <span class="accent">Two-Step</span> Diffusion Generation</h1>
+
+      <p class="hero__sub reveal">
+        <strong>StepBridge</strong> makes any few-step video student better by pairing on-policy trajectory
+        distillation with a frozen higher-step endpoint anchor &mdash; improving SMD, DMD, DMD2, ADV, and rCM
+        at two sampling steps with <strong>zero extra inference cost</strong>.
+      </p>
+
+      <!-- AUTHORS -->
+      <div class="authors reveal">
+        <span>Zhijun Song<sup>1</sup><b class="mark" aria-label="equal contribution">*</b></span>
+        <span>Yinbo Liu<sup>2</sup><b class="mark" aria-label="equal contribution">*</b></span>
+        <span>Peng Zhang<sup>1</sup><b class="mark" aria-label="project leader">&dagger;</b></span>
+        <span>Yang Zhou<sup>1</sup></span>
+        <span>Fei Wang<sup>1</sup></span>
+        <span>Daiguo Zhou<sup>1</sup></span>
+        <span>Jian Luan<sup>1</sup></span>
+      </div>
+      <p class="affil affil--single reveal">
+        <span class="affil__item">
+          <sup>1</sup> <a href="https://www.mi.com" target="_blank" rel="noopener">MiLM Plus, Xiaomi Inc.</a>
+        </span>
+        <span class="affil__sep" aria-hidden="true">&middot;</span>
+        <span class="affil__item">
+          <sup>2</sup> <a href="https://cs.whu.edu.cn" target="_blank" rel="noopener">School of Computer Science, Wuhan University</a>
+        </span>
+        <span class="affil__sep" aria-hidden="true">&middot;</span>
+        <span class="affil__item affil__note"><b>*</b> Equal contribution</span>
+        <span class="affil__sep" aria-hidden="true">&middot;</span>
+        <span class="affil__item affil__note"><b>&dagger;</b> Project leader</span>
+      </p>
+
+      <p class="hero__tagline reveal">
+        same 2 NFE &middot; 1.84&thinsp;s per video &middot; trajectory + distribution &middot; 0 extra modules
+      </p>
+
+      <div class="cta-row reveal">
+        <a class="btn btn--grad" href="#videos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+          Watch comparisons
+        </a>
+        <span class="btn" aria-disabled="true" title="Paper link coming soon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>
+          Paper
+          <span class="btn__soon">Soon</span>
+        </span>
+        <a class="btn btn--ghost" href="#citation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 8H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-3"/><path d="M13 3h8v8"/><path d="M21 3 10 14"/></svg>
+          BibTeX
+        </a>
+        <a class="btn btn--ghost" href="https://github.com/VisualGenMi/StepBridge" target="_blank" rel="noopener" title="Code repository on GitHub">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6-6 6-6M15 6l6 6-6 6"/></svg>
+          Code
+          <span class="btn__soon">GitHub</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- the comparison wall lives in the hero: this is a video paper -->
+    <span id="videos" class="anchor-target" aria-hidden="true"></span>
+    <div class="cinema cinema--hero reveal" id="cinema" tabindex="0"
+         aria-label="Comparison wall: six side-by-side clip pairs">
+      <div class="cinema__wall" id="cinemaWall"></div>
+
+      <div class="cinema__dock">
+        <div class="cinema__dock-row">
+          <span class="cinema__page" id="cinemaPage">set 01 / 03</span>
+          <div class="cinema__dots" id="cinemaDots" role="group" aria-label="Comparison sets"></div>
+
+          <div class="cinema__tools">
+            <button class="cinema__btn" id="cinemaPlay" type="button" aria-label="Pause playback" title="Pause playback">
+              <svg class="icon-pause" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5v14M15 5v14"/></svg>
+              <svg class="icon-play" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5.5v13l11-6.5-11-6.5Z"/></svg>
+            </button>
+            <button class="cinema__btn" id="prevSet" type="button" aria-label="Previous set">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>
+            </button>
+            <button class="cinema__btn" id="nextSet" type="button" aria-label="Next set">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="cinema__status">
+          <span id="cinemaHint">Same prompt, same seed &middot; left: base two-step &middot; right: + StepBridge &middot; click any pair to enlarge</span>
+          <i class="cinema__timer"><u id="cinemaProgress"></u></i>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================== STATS ============================== -->
+  <div class="stats" aria-label="Key results">
+    <div class="stat reveal">
+      <div class="stat__num">+2.15</div>
+      <div class="stat__label"><b>VBench Total</b>Two-step SMD: 81.02 &rarr; 83.17</div>
+    </div>
+    <div class="stat reveal">
+      <div class="stat__num">83.78</div>
+      <div class="stat__label"><b>Best two-step total</b>DMD + StepBridge, above its 4-step reference</div>
+    </div>
+    <div class="stat reveal">
+      <div class="stat__num">1.84<small>s</small></div>
+      <div class="stat__label"><b>Same inference budget</b>2 NFE &middot; 18.4 GB, no auxiliary modules</div>
+    </div>
+    <div class="stat reveal">
+      <div class="stat__num">&times;51</div>
+      <div class="stat__label"><b>Faster than teacher</b>1.84 s vs. 95.0 s for 50-step sampling</div>
+    </div>
+  </div>
+
+  <!-- ============================== METHOD ============================== -->
+  <section id="method" class="steps-section method-section">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">02</span> Method</div>
+        <h2 class="section-title">From fifty steps to two.</h2>
+        <p class="section-lede">
+          One trajectory, crossed in far fewer strides &mdash; then three models arranged around it, so the
+          two-step student learns both <em>how</em> to move and <em>where</em> to land.
+        </p>
+      </div>
+
+      <div class="subsec" id="steps">
+        <header class="subsec__head reveal">
+          <div class="subsec__label">
+            <span class="subsec__num">3.1</span>
+            <h3 class="subsec__title">Steps and supervision</h3>
+          </div>
+          <p class="subsec__lede">
+            Fifty denoising steps compress to four, then two. Three models then arrange around that
+            shortened path, so the student learns <em>how</em> to move as well as <em>where</em> to land.
+          </p>
+        </header>
+
+      <div class="duo">
+      <div class="stepviz reveal" id="stepviz">
+        <div class="stepviz__stage" id="stepStage">
+          <canvas id="stepCanvas" role="img"
+            aria-label="3D animation of a denoising trajectory as a twisting corridor. Gates along the corridor mark sampling steps: 50 dense gates for the teacher, 4 gates for the four-step reference, and 2 gates for the two-step StepBridge student."></canvas>
+
+          <div class="stepviz__hud">
+            <div class="stepviz__kicker">Sampling steps</div>
+            <div class="stepviz__nfe">
+              <span data-hud="nfe">50</span><em>steps</em>
+            </div>
+            <div class="stepviz__stage-label" data-hud="label">Multi-step teacher &middot; 100 DiT evals</div>
+          </div>
+
+          <div class="stepviz__metrics">
+            <div class="stepviz__metric">
+              <b data-hud="latency">95.0<i>s</i></b>
+              <span>per video</span>
+            </div>
+            <div class="stepviz__metric">
+              <b data-hud="total">83.38</b>
+              <span>VBench total</span>
+            </div>
+          </div>
+
+          <div class="stepviz__corner stepviz__corner--noise">
+            <i class="stepviz__pulse"></i>pure noise &middot; &sigma; = 1
+          </div>
+          <div class="stepviz__corner stepviz__corner--clean">
+            clean latent &middot; &sigma; = 0<i class="stepviz__pulse stepviz__pulse--warm"></i>
+          </div>
+
+          <div class="stepviz__anchor" aria-hidden="true">
+            <span class="stepviz__anchor-dot"></span>
+            endpoint anchored to the 4-step reference
+          </div>
+
+          <div class="stepviz__legend" aria-hidden="true">
+            <span>noise</span>
+            <i class="stepviz__ramp"></i>
+            <span>clean</span>
+          </div>
+        </div>
+
+        <div class="stepviz__controls">
+          <div class="stepflow" role="tablist" aria-label="Sampling step budget">
+            <button class="stepflow__node is-active" data-step="50" type="button" role="tab" aria-selected="true">
+              <span class="stepflow__n">50</span>
+              <span class="stepflow__l">teacher</span>
+            </button>
+
+            <div class="stepflow__link" aria-hidden="true">
+              <span class="stepflow__rail"><i></i><i></i><i></i><b></b></span>
+              <span class="stepflow__cap">100 &rarr; 4 evals &middot; 25&times; faster</span>
+            </div>
+
+            <button class="stepflow__node" data-step="4" type="button" role="tab" aria-selected="false">
+              <span class="stepflow__n">4</span>
+              <span class="stepflow__l">reference</span>
+            </button>
+
+            <div class="stepflow__link stepflow__link--wide" aria-hidden="true">
+              <span class="stepflow__rail"><i></i><i></i><i></i><i></i><b></b></span>
+              <span class="stepflow__cap">4 &rarr; 2 evals &middot; same endpoint</span>
+            </div>
+
+            <button class="stepflow__node" data-step="2" type="button" role="tab" aria-selected="false">
+              <span class="stepflow__n">2</span>
+              <span class="stepflow__l">StepBridge</span>
+            </button>
+          </div>
+
+          <div class="stepviz__progress" aria-hidden="true"><i id="stepProgress"></i></div>
+
+          <span class="stepviz__hint">Move to steer &middot; drag to orbit</span>
+        </div>
+      </div>
+
+        <div class="stepviz archviz">
+          <div class="stepviz__stage archviz__stage">
+            <canvas id="archCanvas" role="img"
+              aria-label="3D diagram of three timelines. A dense 50-step teacher rail at the bottom, the two-step student rail in the middle, and the frozen four-step reference rail at the top. Upward beams from the teacher to the student represent on-policy velocity distillation; a downward beam from the reference to the student endpoint represents anchored distribution matching; a dashed link at the start represents initialization from the four-step checkpoint."></canvas>
+          </div>
+
+          <div class="stepviz__controls archviz__controls">
+            <div class="archviz__legend">
+              <span class="archviz__key"><i class="swatch swatch--warm"></i><b>4-step reference</b> frozen</span>
+              <span class="archviz__key"><i class="swatch swatch--violet"></i><b>2-step student</b> deployed &middot; 2 NFE</span>
+              <span class="archviz__key"><i class="swatch swatch--blue"></i><b>50-step teacher</b> frozen</span>
+            </div>
+
+            <div class="chips" role="group" aria-label="Isolate a supervision signal">
+              <button class="chip is-active" data-signal="all" type="button">All signals</button>
+              <button class="chip" data-signal="opd" type="button">OPD</button>
+              <button class="chip" data-signal="anchor" type="button">Anchor</button>
+            </div>
+
+            <span class="stepviz__hint">Move to tilt the rails</span>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <div class="arch" id="arch">
+        <p class="stepviz__note duo__note">
+          <b>Top:</b> each gate is one network evaluation, and each lit span is a transition the student
+          must learn; at two steps one transition spans half the trajectory. <b>Bottom:</b> the target is
+          an interval, not a point. A window of width <em>w</em> opens inside a coarse step, the bar over
+          it is the student's <b>mean velocity across that window</b>, and the teacher returns its velocity
+          at the window centre (violet up: the query; blue down: the answer). The band at the end is the
+          endpoint anchor, the short arc is the four-step checkpoint that initialises the student, and all
+          three rails share one clock.
+        </p>
+
+        <div class="arch-roles">
+          <div class="arch-role">
+            <span class="arch-role__dot arch-role__dot--blue"></span>
+            <b>Teacher &mdash; answers, never dictates</b>
+            <p>Queried at student-visited states, and returns the velocity over a finite window, so the target is an interval mean rather than a single-point slope.</p>
+          </div>
+          <div class="arch-role">
+            <span class="arch-role__dot arch-role__dot--warm"></span>
+            <b>Reference &mdash; defines where to land</b>
+            <p>Frozen at four steps; its endpoint distribution is what the student is anchored to, not a per-step target.</p>
+          </div>
+          <div class="arch-role">
+            <span class="arch-role__dot arch-role__dot--violet"></span>
+            <b>Student &mdash; trained once, deployed as-is</b>
+            <p>Two Euler steps, the same sampler as the base model, no extra heads, no extra evaluations.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="arch-metrics reveal">
+        <div class="arch-metric">
+          <b>2</b><span>DiT evaluations</span>
+        </div>
+        <div class="arch-metric">
+          <b>1.84<i>s</i></b><span>per video</span>
+        </div>
+        <div class="arch-metric">
+          <b>&times;51</b><span>faster than the 50-step teacher</span>
+        </div>
+        <div class="arch-metric">
+          <b>0</b><span>auxiliary modules at inference</span>
+        </div>
+      </div>
+
+      <div class="pipeline">
+        <article class="step-card reveal">
+          <span class="step-card__idx">1</span>
+          <h3>Trajectory supervision</h3>
+          <p>A boundary-preserving Pivot path exposes intermediate states inside each coarse interval, while the teacher is queried at the window midpoint. The student matches the teacher's <em>interval-averaged</em> velocity rather than an instantaneous one.</p>
+          <span class="step-card__tag">&#8466;<sub>OPD</sub> &middot; interval-averaged</span>
+        </article>
+        <article class="step-card reveal">
+          <span class="step-card__idx">2</span>
+          <h3>Endpoint anchoring</h3>
+          <p>The frozen four-step generator yields reference samples; a second estimator tracks the student's own endpoint distribution. Their denoised-prediction difference forms the DMD pseudo-gradient at the student's output.</p>
+          <span class="step-card__tag">&#119966;<sub>DMD</sub> &middot; anchored</span>
+        </article>
+        <article class="step-card reveal">
+          <span class="step-card__idx">3</span>
+          <h3>Gradient coordination</h3>
+          <p>A norm controller tunes the effective DMD weight, and asymmetric projection removes only the component of the auxiliary gradient that opposes OPD &mdash; leaving the trajectory direction intact.</p>
+          <span class="step-card__tag">&#120007;<sub>total</sub> &middot; coordinated</span>
+        </article>
+      </div>
+
+      <div class="deep-dive">
+        <div class="panel">
+          <h3>Why not simply add the losses?</h3>
+          <p>Directly summing OPD and DMD drops the VBench Total of the SMD student from 82.40 (anchor alone) to
+            <b>81.04</b>: the two gradients are actively in conflict. StepBridge resolves this in magnitude and in
+            direction, recovering the gain and then some.</p>
+          <div class="note-strip" style="margin-top:18px">
+            <span><b>Pivot</b> is used during training only</span>
+            <span class="sep"></span>
+            <span><b>Same 2-step sampler</b> at inference</span>
+            <span class="sep"></span>
+            <span><b>No new parameters</b> deployed</span>
+          </div>
+        </div>
+
+        <div class="panel panel--dark">
+          <h3>Optimization, in four lines</h3>
+          <div class="equations">
+            <div class="eq">
+              <span><i>L</i><sub>student</sub> = <i>L</i><sub>OPD</sub> + &lambda;<sub>t</sub><sup>eff</sup> <i>L</i><sub>DMD</sub></span>
+              <span class="eq__tag">objective</span>
+            </div>
+            <div class="eq">
+              <span><i>g</i><sub>DMD</sub> = (x&#770;<sub>0,F</sub> &minus; x&#770;<sub>0,A</sub>) / &nu;(y)</span>
+              <span class="eq__tag">anchor signal</span>
+            </div>
+            <div class="eq">
+              <span><i>g&#771;</i><sub>D</sub> = <i>g</i><sub>D</sub> &minus; &beta;<sub>s</sub> &middot; min(0, <i>g</i><sub>O</sub><sup>&#8868;</sup><i>g</i><sub>D</sub>) / (&#8214;<i>g</i><sub>O</sub>&#8214;<sup>2</sup> + &epsilon;) &middot; <i>g</i><sub>O</sub></span>
+              <span class="eq__tag">projection</span>
+            </div>
+            <div class="eq">
+              <span><i>g</i><sub>total</sub> = <i>g</i><sub>O</sub> + &lambda;<sub>t</sub><sup>eff</sup> <i>g&#771;</i><sub>D</sub></span>
+              <span class="eq__tag">update</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="figure figure--paper reveal">
+        <div class="figure__media" data-zoom="assets/figures/fig2.webp" data-caption="StepBridge combines on-policy trajectory supervision with a frozen higher-step endpoint anchor. The Pivot decoder, reference generator, and auxiliary score networks are used during training; inference retains only the two-step student.">
+          <img src="assets/figures/fig2.webp" width="3156" height="1588" loading="lazy" alt="StepBridge overview: frozen four-step anchor, Pivot-based OPD, and anchored DMD branches feeding a shared two-step student.">
+          <span class="zoom-hint">Click to enlarge</span>
+        </div>
+        <figcaption>
+          <b>Figure 2 &middot; Overview.</b> A frozen four-step generator initializes the student and provides an
+          endpoint anchor. A training-only Pivot decoder supplies intermediate states for segment-wise on-policy
+          distillation, and two auxiliary flow estimators turn their denoised-prediction gap into a distribution-matching
+          gradient. At inference, only the two-step student remains.
+        </figcaption>
+      </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== ABSTRACT ============================== -->
+  <section id="abstract">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">03</span> Abstract</div>
+        <h2 class="section-title">Two signals, one student.</h2>
+        <p class="section-lede">Trajectory supervision says <em>how</em> to move; distribution matching says <em>where</em> to land. StepBridge uses both &mdash; and keeps them from interfering.</p>
+      </div>
+
+      <div class="abstract-grid">
+        <div class="abstract-copy">
+          <div class="abstract-quote reveal">
+            <p class="abstract-text">
+              Compressing video generation into just two steps requires a student model to learn coherent generation
+              trajectories while preserving the quality of the output distribution under a severely limited sampling
+              budget.<sup class="ref-mark" data-ref="1" title="The constraint">1</sup> However, a multi-step teacher provides rich trajectory supervision that may not fully align with
+              the student's compressed sampling process. Conversely, a pre-distilled few-step generator provides a
+              high-quality distributional reference but lacks explicit guidance on the student's generation trajectory.<sup class="ref-mark" data-ref="2" title="The two signals">2</sup>
+              To address these challenges, we propose <strong>StepBridge</strong>, a few-step distillation framework that
+              combines trajectory-level and distribution-level supervision. Specifically, we perform on-policy
+              distillation (OPD) along student-induced proxy trajectories to preserve trajectory-aware learning, while
+              introducing DMD-style endpoint matching against a frozen reference generator to anchor the student's output
+              distribution.<sup class="ref-mark" data-ref="3" title="StepBridge">3</sup> Furthermore, we design adaptive gradient scaling and asymmetric gradient projection to
+              coordinate the optimization of these complementary supervision signals.<sup class="ref-mark" data-ref="4" title="Coordination">4</sup> The frozen reference generator also
+              serves to initialize the student model, while all auxiliary components are discarded after training.
+              Experiments demonstrate consistent improvements in two-step video generation across both purely
+              trajectory-based and purely distribution-based few-step distillation methods, without introducing
+              additional inference overhead.
+            </p>
+          </div>
+
+          <div class="tldr reveal">
+            <span class="tldr__tag">TL;DR</span>
+            <p>
+              A frozen four-step generator supplies the <b>endpoint distribution</b>; a frozen multi-step teacher supplies
+              <b>interval-averaged velocity</b> along student-induced trajectories. Adaptive scaling and asymmetric
+              projection keep the two gradients from fighting, so the student improves without changing how it samples at
+              inference.
+            </p>
+          </div>
+        </div>
+
+        <aside class="flowchart reveal" aria-labelledby="flowTitle">
+          <div class="flowchart__head">
+            <span class="flowchart__kicker">Reading guide</span>
+            <span class="flowchart__hint">abstract &rarr; method</span>
+          </div>
+          <h3 class="flowchart__title" id="flowTitle">The abstract, as a diagram</h3>
+
+          <div class="flow">
+            <div class="flow__stage" data-stage="1">
+              <div class="flow__card">
+                <div class="flow__label"><i>1</i>The constraint</div>
+                <b>Two steps for a 50-step trajectory</b>
+                <p>Every transition now has to cover half of the latent path, so errors cannot be fixed later.</p>
+              </div>
+            </div>
+
+            <div class="flow__conn" aria-hidden="true">
+              <svg viewBox="0 0 100 34" preserveAspectRatio="none">
+                <path class="flow__wire" vector-effect="non-scaling-stroke" d="M50 0V9M50 9H25V34M50 9H75V34"/>
+              </svg>
+            </div>
+
+            <div class="flow__stage flow__stage--pair" data-stage="2">
+              <div class="flow__card flow__card--blue">
+                <div class="flow__label"><i>2</i>Multi-step teacher</div>
+                <b>Rich trajectory</b>
+                <p>Queried off-policy, along a path the student never walks.</p>
+              </div>
+              <div class="flow__card flow__card--warm">
+                <div class="flow__label"><i>2</i>Few-step generator</div>
+                <b>Right distribution</b>
+                <p>Gives the target endpoint, but no guidance on getting there.</p>
+              </div>
+            </div>
+
+            <div class="flow__conn" aria-hidden="true">
+              <svg viewBox="0 0 100 34" preserveAspectRatio="none">
+                <path class="flow__wire" vector-effect="non-scaling-stroke" d="M25 0V15M75 0V15M25 15H75M50 15V34"/>
+              </svg>
+            </div>
+
+            <div class="flow__stage" data-stage="3">
+              <div class="flow__card flow__card--core">
+                <div class="flow__label"><i>3</i>StepBridge</div>
+                <b>Use both, on the same student</b>
+                <ul class="flow__list">
+                  <li>
+                    <i class="flow__dot flow__dot--blue"></i>
+                    <span><em>L</em><sub>OPD</sub> on-policy velocity, along student-induced proxy trajectories</span>
+                  </li>
+                  <li>
+                    <i class="flow__dot flow__dot--warm"></i>
+                    <span><em>L</em><sub>DMD</sub> endpoint matching against a frozen four-step reference</span>
+                  </li>
+                </ul>
+                <span class="flow__foot">the same checkpoint also initializes the student</span>
+              </div>
+            </div>
+
+            <div class="flow__conn flow__conn--line" aria-hidden="true"></div>
+
+            <div class="flow__stage" data-stage="4">
+              <div class="flow__card">
+                <div class="flow__label"><i>4</i>Coordination</div>
+                <b>Adaptive scaling &amp; asymmetric projection</b>
+                <p>Keeps the two gradients from cancelling, so the trajectory direction survives.</p>
+              </div>
+            </div>
+
+            <div class="flow__conn flow__conn--line" aria-hidden="true"></div>
+
+            <div class="flow__result">
+              <span class="flow__result-k">Result</span>
+              <b>Consistent gains, same sampler</b>
+              <span class="flow__result-m">2 NFE &middot; 1.84&thinsp;s &middot; 0 extra modules</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <div class="contrib-grid">
+        <div class="contrib reveal">
+          <div class="contrib__num">01 &mdash;</div>
+          <h3>Higher-step endpoint anchoring</h3>
+          <p>A frozen four-step generator both initializes the two-step student and defines the endpoint distribution it is matched against, via a DMD-style pseudo-gradient.</p>
+        </div>
+        <div class="contrib reveal">
+          <div class="contrib__num">02 &mdash;</div>
+          <h3>Unified trajectory + distribution supervision</h3>
+          <p>Segment-wise OPD runs through a training-only Pivot decoder with interval-averaged velocity targets, while endpoint matching anchors where the student lands.</p>
+        </div>
+        <div class="contrib reveal">
+          <div class="contrib__num">03 &mdash;</div>
+          <h3>Coordination that actually helps</h3>
+          <p>Adaptive gradient scaling and asymmetric projection resolve the observed 107.3&deg; conflict, validated on SMD, DMD, and DMD2 at 1.3B and on a 14B backbone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== RESULTS ============================== -->
+  <section id="results">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">04</span> Results</div>
+        <h2 class="section-title">Two steps, higher quality.</h2>
+        <p class="section-lede">All numbers are VBench scores over five random seeds on 81-frame, 480&times;832 videos. StepBridge is added on top of existing two-step students and changes nothing at inference.</p>
+      </div>
+
+      <div class="delta-grid">
+        <div class="delta reveal">
+          <div class="delta__top">
+            <span class="delta__name">SMD <i>&rarr;</i> SMD + StepBridge</span>
+            <span class="delta__badge">NFE 2</span>
+          </div>
+          <div class="delta__values">
+            <span class="delta__from">81.02</span>
+            <span class="delta__arrow">&rarr;</span>
+            <span class="delta__to">83.17</span>
+            <span class="delta__gain">+2.15</span>
+          </div>
+          <div class="delta__track"><span class="delta__fill" style="width:100%"></span></div>
+          <div class="delta__note">Recovers two-thirds of the gap to its four-step student.</div>
+        </div>
+
+        <div class="delta reveal">
+          <div class="delta__top">
+            <span class="delta__name">DMD <i>&rarr;</i> DMD + StepBridge</span>
+            <span class="delta__badge">NFE 2</span>
+          </div>
+          <div class="delta__values">
+            <span class="delta__from">82.74</span>
+            <span class="delta__arrow">&rarr;</span>
+            <span class="delta__to">83.78</span>
+            <span class="delta__gain">+1.04</span>
+          </div>
+          <div class="delta__track"><span class="delta__fill" style="width:62%"></span></div>
+          <div class="delta__note">Highest two-step Total and Quality &mdash; above its own four-step score (83.72).</div>
+        </div>
+
+        <div class="delta reveal">
+          <div class="delta__top">
+            <span class="delta__name">DMD2 <i>&rarr;</i> DMD2 + StepBridge</span>
+            <span class="delta__badge">NFE 2</span>
+          </div>
+          <div class="delta__values">
+            <span class="delta__from">83.13</span>
+            <span class="delta__arrow">&rarr;</span>
+            <span class="delta__to">83.31</span>
+            <span class="delta__gain">+0.18</span>
+          </div>
+          <div class="delta__track"><span class="delta__fill" style="width:22%"></span></div>
+          <div class="delta__note">Gains concentrate in semantic alignment and aesthetic quality.</div>
+        </div>
+
+        <div class="delta reveal">
+          <div class="delta__top">
+            <span class="delta__name">ADV <i>&rarr;</i> ADV + StepBridge</span>
+            <span class="delta__badge">NFE 2</span>
+          </div>
+          <div class="delta__values">
+            <span class="delta__from">80.44</span>
+            <span class="delta__arrow">&rarr;</span>
+            <span class="delta__to">81.22</span>
+            <span class="delta__gain">+0.78</span>
+          </div>
+          <div class="delta__track"><span class="delta__fill" style="width:44%"></span></div>
+          <div class="delta__note">Recovers 60.0% of the gap; Quality +0.49, Semantic +1.98.</div>
+        </div>
+
+        <div class="delta reveal">
+          <div class="delta__top">
+            <span class="delta__name">rCM <i>&rarr;</i> rCM + StepBridge</span>
+            <span class="delta__badge">NFE 2</span>
+          </div>
+          <div class="delta__values">
+            <span class="delta__from">83.51</span>
+            <span class="delta__arrow">&rarr;</span>
+            <span class="delta__to">84.19</span>
+            <span class="delta__gain">+0.68</span>
+          </div>
+          <div class="delta__track"><span class="delta__fill" style="width:38%"></span></div>
+          <div class="delta__note">Recovers 76.4% of the gap; Dynamic Degree 0.7269 &rarr; 0.8056.</div>
+        </div>
+      </div>
+
+      <div class="recovery reveal">
+        <div class="recovery__head">
+          <h3>How much of the four-step gap comes back</h3>
+          <p>Each bar is the share of the two-step &rarr; four-step Total gap that StepBridge recovers, across every
+            setting we trained. Bars above the 100% line mean the two-step student overtook its own four-step reference.</p>
+        </div>
+        <div class="recovery__rows">
+          <div class="recovery__row">
+            <span class="recovery__label">1.3B &middot; SMD<small>81.02 &rarr; 83.17 &middot; ref 84.24</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:66.8%"></span></span>
+            <span class="recovery__val">66.8%</span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">1.3B &middot; DMD<small>82.74 &rarr; 83.78 &middot; ref 83.72</small></span>
+            <span class="recovery__track"><span class="recovery__fill recovery__fill--over" style="--p:100%"></span><u class="recovery__cap"></u></span>
+            <span class="recovery__val">106%<i>beats 4-step</i></span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">1.3B &middot; DMD2<small>83.13 &rarr; 83.31 &middot; ref 84.26</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:15.9%"></span></span>
+            <span class="recovery__val">15.9%</span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">1.3B &middot; ADV<small>80.44 &rarr; 81.22 &middot; ref 81.74</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:60%"></span></span>
+            <span class="recovery__val">60.0%</span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">1.3B &middot; rCM<small>83.51 &rarr; 84.19 &middot; ref 84.40</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:76.4%"></span></span>
+            <span class="recovery__val">76.4%</span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">14B &middot; SMD<small>80.84 &rarr; 84.33 &middot; ref 84.54</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:94.3%"></span></span>
+            <span class="recovery__val">94.3%</span>
+          </div>
+          <div class="recovery__row">
+            <span class="recovery__label">14B &middot; DMD<small>83.97 &rarr; 84.26 &middot; ref 84.45</small></span>
+            <span class="recovery__track"><span class="recovery__fill" style="--p:60.4%"></span></span>
+            <span class="recovery__val">60.4%</span>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="table-card reveal" id="resultsTable">
+        <div class="table-toolbar">
+          <span class="table-toolbar__title">VBench comparison</span>
+          <div class="table-tabs" role="tablist" aria-label="Benchmark table">
+            <button class="table-tab is-active" data-table="core" role="tab" aria-selected="true" type="button">1.3B &middot; main</button>
+            <button class="table-tab" data-table="extra" role="tab" aria-selected="false" type="button">1.3B &middot; ADV / rCM</button>
+            <button class="table-tab" data-table="14b" role="tab" aria-selected="false" type="button">14B backbone</button>
+          </div>
+          <div class="chips" role="group" aria-label="Filter table rows" data-chips="core">
+            <button class="chip is-active" data-filter="all" type="button">All</button>
+            <button class="chip" data-filter="four" type="button">NFE 4</button>
+            <button class="chip" data-filter="two" type="button">NFE 2</button>
+            <button class="chip" data-filter="ours" type="button">+ StepBridge</button>
+          </div>
+        </div>
+
+        <div class="table-panel is-active" data-panel="core">
+        <div class="table-scroll">
+          <table class="data" id="mainTable">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th rowspan="2">NFE</th>
+                <th colspan="3" class="group">VBench</th>
+                <th colspan="5" class="group">Consistency &amp; motion</th>
+                <th rowspan="2">Ae.Qu. &uarr;</th>
+              </tr>
+              <tr>
+                <th>Total &uarr;</th>
+                <th>Quality &uarr;</th>
+                <th>Semantic &uarr;</th>
+                <th>Su.Co. &uarr;</th>
+                <th>Ba.Co. &uarr;</th>
+                <th>Te.Fl. &uarr;</th>
+                <th>Mo.Sm. &uarr;</th>
+                <th>Dy.De. &uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-group="four">
+                <td>Wan2.1 teacher (1.3B)</td>
+                <td><span class="nfe">50</span></td>
+                <td>83.38<span class="pm">&pm;.20</span></td>
+                <td>84.11<span class="pm">&pm;.18</span></td>
+                <td>80.48<span class="pm">&pm;.45</span></td>
+                <td>0.9571</td>
+                <td>0.9762</td>
+                <td>0.9956</td>
+                <td>0.9842</td>
+                <td>0.6111</td>
+                <td>0.6393</td>
+              </tr>
+              <tr data-group="four">
+                <td>SMD</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.24<span class="pm">&pm;.15</span></td>
+                <td>85.54<span class="pm">&pm;.25</span></td>
+                <td>79.03<span class="pm">&pm;.51</span></td>
+                <td>0.9649</td>
+                <td>0.9511</td>
+                <td>0.9924</td>
+                <td>0.9879</td>
+                <td>0.7500</td>
+                <td>0.6570</td>
+              </tr>
+              <tr data-group="four">
+                <td>DMD</td>
+                <td><span class="nfe">4</span></td>
+                <td>83.72<span class="pm">&pm;.17</span></td>
+                <td>84.68<span class="pm">&pm;.26</span></td>
+                <td>79.88<span class="pm">&pm;.22</span></td>
+                <td>0.9575</td>
+                <td>0.9560</td>
+                <td>0.9802</td>
+                <td>0.9783</td>
+                <td>0.7963</td>
+                <td>0.6429</td>
+              </tr>
+              <tr data-group="four">
+                <td>DMD2</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.26<span class="pm">&pm;.19</span></td>
+                <td>85.48<span class="pm">&pm;.15</span></td>
+                <td>79.39<span class="pm">&pm;.55</span></td>
+                <td>0.9678</td>
+                <td>0.9616</td>
+                <td>0.9923</td>
+                <td>0.9868</td>
+                <td>0.7593</td>
+                <td>0.6529</td>
+              </tr>
+              <tr data-group="four">
+                <td>rCM</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.40<span class="pm">&pm;.22</span></td>
+                <td>85.20<span class="pm">&pm;.20</span></td>
+                <td>81.17<span class="pm">&pm;.30</span></td>
+                <td>0.9525</td>
+                <td>0.9598</td>
+                <td>0.9900</td>
+                <td>0.9804</td>
+                <td>0.8333</td>
+                <td>0.6476</td>
+              </tr>
+              <tr data-group="four">
+                <td>AnyFlow</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.31<span class="pm">&pm;.12</span></td>
+                <td>85.10<span class="pm">&pm;.18</span></td>
+                <td>81.14<span class="pm">&pm;.45</span></td>
+                <td>0.9773</td>
+                <td>0.9699</td>
+                <td>0.9924</td>
+                <td>0.9836</td>
+                <td>0.6389</td>
+                <td>0.6707</td>
+              </tr>
+              <tr data-group="two" class="group-start">
+                <td>SMD</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>81.02<span class="pm">&pm;.33</span></td>
+                <td>82.82<span class="pm">&pm;.31</span></td>
+                <td>73.84<span class="pm">&pm;.98</span></td>
+                <td>0.9593</td>
+                <td>0.9556</td>
+                <td class="cell-second">0.9931</td>
+                <td class="cell-second">0.9893</td>
+                <td>0.6343</td>
+                <td>0.6162</td>
+              </tr>
+              <tr data-group="two">
+                <td>DMD</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>82.74<span class="pm">&pm;.07</span></td>
+                <td>83.77<span class="pm">&pm;.25</span></td>
+                <td>78.59<span class="pm">&pm;.69</span></td>
+                <td>0.9559</td>
+                <td>0.9544</td>
+                <td>0.9805</td>
+                <td>0.9762</td>
+                <td class="cell-second">0.7500</td>
+                <td>0.6321</td>
+              </tr>
+              <tr data-group="two">
+                <td>DMD2</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>83.13<span class="pm">&pm;.02</span></td>
+                <td class="cell-third">84.43<span class="pm">&pm;.08</span></td>
+                <td>77.94<span class="pm">&pm;.29</span></td>
+                <td class="cell-second">0.9672</td>
+                <td class="cell-third">0.9583</td>
+                <td class="cell-best">0.9951</td>
+                <td class="cell-third">0.9889</td>
+                <td>0.6667</td>
+                <td>0.6305</td>
+              </tr>
+              <tr data-group="two">
+                <td>rCM</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-third">83.51<span class="pm">&pm;.27</span></td>
+                <td>84.42<span class="pm">&pm;.24</span></td>
+                <td class="cell-third">79.86<span class="pm">&pm;.65</span></td>
+                <td>0.9527</td>
+                <td>0.9552</td>
+                <td>0.9915</td>
+                <td>0.9808</td>
+                <td class="cell-third">0.7269</td>
+                <td>0.6470</td>
+              </tr>
+              <tr data-group="two">
+                <td>AnyFlow</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-second">83.64<span class="pm">&pm;.04</span></td>
+                <td>84.31<span class="pm">&pm;.14</span></td>
+                <td class="cell-best">80.97<span class="pm">&pm;.36</span></td>
+                <td class="cell-best">0.9756</td>
+                <td class="cell-best">0.9656</td>
+                <td>0.9920</td>
+                <td>0.9840</td>
+                <td>0.5648</td>
+                <td class="cell-best">0.6651</td>
+              </tr>
+              <tr data-group="ours" class="is-ours group-start">
+                <td>SMD + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>83.17<span class="pm">&pm;.25</span></td>
+                <td class="cell-second">84.60<span class="pm">&pm;.21</span></td>
+                <td>77.43<span class="pm">&pm;.88</span></td>
+                <td class="cell-third">0.9626</td>
+                <td class="cell-second">0.9597</td>
+                <td class="cell-third">0.9930</td>
+                <td class="cell-best">0.9900</td>
+                <td>0.6065</td>
+                <td class="cell-second">0.6523</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>DMD + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-best">83.78<span class="pm">&pm;.15</span></td>
+                <td class="cell-best">84.75<span class="pm">&pm;.16</span></td>
+                <td class="cell-second">79.91<span class="pm">&pm;.52</span></td>
+                <td>0.9584</td>
+                <td>0.9548</td>
+                <td>0.9768</td>
+                <td>0.9783</td>
+                <td class="cell-best">0.7963</td>
+                <td class="cell-third">0.6489</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>DMD2 + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>83.31<span class="pm">&pm;.12</span></td>
+                <td>84.27<span class="pm">&pm;.22</span></td>
+                <td>79.44<span class="pm">&pm;.44</span></td>
+                <td>0.9607</td>
+                <td>0.9577</td>
+                <td>0.9912</td>
+                <td>0.9878</td>
+                <td>0.6389</td>
+                <td>0.6413</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-caption">Main paper, Table 1. Highlighting is computed among NFE&nbsp;=&nbsp;2 methods; &plusmn; is the standard deviation over five seeds.</p>
+        </div>
+
+        <div class="table-panel" data-panel="extra">
+          <div class="table-scroll">
+            <table class="data">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th rowspan="2">NFE</th>
+                <th colspan="3" class="group">VBench</th>
+                <th colspan="5" class="group">Consistency &amp; motion</th>
+                <th rowspan="2">Ae.Qu. &uarr;</th>
+              </tr>
+              <tr>
+                <th>Total &uarr;</th>
+                <th>Quality &uarr;</th>
+                <th>Semantic &uarr;</th>
+                <th>Su.Co. &uarr;</th>
+                <th>Ba.Co. &uarr;</th>
+                <th>Te.Fl. &uarr;</th>
+                <th>Mo.Sm. &uarr;</th>
+                <th>Dy.De. &uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-group="four">
+                <td>ADV</td>
+                <td><span class="nfe">4</span></td>
+                <td>81.74</td>
+                <td>82.58</td>
+                <td>78.36</td>
+                <td>0.9588</td>
+                <td>0.9437</td>
+                <td>0.9681</td>
+                <td>0.9843</td>
+                <td>0.6111</td>
+                <td>0.6435</td>
+              </tr>
+              <tr data-group="four">
+                <td>rCM</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.40</td>
+                <td>85.20</td>
+                <td>81.17</td>
+                <td>0.9525</td>
+                <td>0.9598</td>
+                <td>0.9900</td>
+                <td>0.9804</td>
+                <td>0.8333</td>
+                <td>0.6476</td>
+              </tr>
+              <tr data-group="two">
+                <td>ADV</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>80.44</td>
+                <td>81.37</td>
+                <td>76.70</td>
+                <td class="cell-best">0.9635</td>
+                <td>0.9341</td>
+                <td>0.9744</td>
+                <td>0.9841</td>
+                <td>0.5000</td>
+                <td>0.6192</td>
+              </tr>
+              <tr data-group="two">
+                <td>rCM</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-second">83.51</td>
+                <td class="cell-second">84.42</td>
+                <td class="cell-second">79.86</td>
+                <td>0.9527</td>
+                <td class="cell-second">0.9552</td>
+                <td class="cell-best">0.9915</td>
+                <td>0.9808</td>
+                <td class="cell-second">0.7269</td>
+                <td class="cell-second">0.6470</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>ADV + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>81.22</td>
+                <td>81.86</td>
+                <td>78.68</td>
+                <td class="cell-second">0.9605</td>
+                <td>0.9461</td>
+                <td>0.9685</td>
+                <td class="cell-best">0.9848</td>
+                <td>0.5046</td>
+                <td>0.6409</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>rCM + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-best">84.19</td>
+                <td class="cell-best">85.10</td>
+                <td class="cell-best">80.55</td>
+                <td>0.9476</td>
+                <td class="cell-best">0.9577</td>
+                <td class="cell-second">0.9906</td>
+                <td>0.9810</td>
+                <td class="cell-best">0.8056</td>
+                <td class="cell-best">0.6484</td>
+              </tr>
+            </tbody>
+            </table>
+          </div>
+          <p class="table-caption">Supplementary Table S1. ADV and rCM on the 1.3B backbone. StepBridge recovers 60.0% and 76.4% of their two-step &rarr; four-step Total gap; rCM + StepBridge also lifts Dynamic Degree from 0.7269 to 0.8056.</p>
+        </div>
+
+        <div class="table-panel" data-panel="14b">
+          <div class="table-scroll">
+            <table class="data">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th rowspan="2">NFE</th>
+                <th colspan="3" class="group">VBench</th>
+                <th colspan="5" class="group">Consistency &amp; motion</th>
+                <th rowspan="2">Ae.Qu. &uarr;</th>
+              </tr>
+              <tr>
+                <th>Total &uarr;</th>
+                <th>Quality &uarr;</th>
+                <th>Semantic &uarr;</th>
+                <th>Su.Co. &uarr;</th>
+                <th>Ba.Co. &uarr;</th>
+                <th>Te.Fl. &uarr;</th>
+                <th>Mo.Sm. &uarr;</th>
+                <th>Dy.De. &uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-group="four">
+                <td>rCM</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.52</td>
+                <td>85.25</td>
+                <td>81.62</td>
+                <td>0.9580</td>
+                <td>0.9678</td>
+                <td>0.9896</td>
+                <td>0.9800</td>
+                <td>0.7130</td>
+                <td>0.6692</td>
+              </tr>
+              <tr data-group="four">
+                <td>SMD</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.54</td>
+                <td>85.62</td>
+                <td>80.25</td>
+                <td>0.9679</td>
+                <td>0.9586</td>
+                <td>0.9815</td>
+                <td>0.9861</td>
+                <td>0.8009</td>
+                <td>0.6619</td>
+              </tr>
+              <tr data-group="four">
+                <td>DMD</td>
+                <td><span class="nfe">4</span></td>
+                <td>84.45</td>
+                <td>84.93</td>
+                <td>82.55</td>
+                <td>0.9682</td>
+                <td>0.9709</td>
+                <td>0.9900</td>
+                <td>0.9866</td>
+                <td>0.5787</td>
+                <td>0.6617</td>
+              </tr>
+              <tr data-group="two">
+                <td>rCM</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>83.77</td>
+                <td>84.37</td>
+                <td>81.35</td>
+                <td>0.9584</td>
+                <td>0.9671</td>
+                <td class="cell-second">0.9896</td>
+                <td>0.9831</td>
+                <td>0.6620</td>
+                <td>0.6480</td>
+              </tr>
+              <tr data-group="two">
+                <td>SMD</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>80.84</td>
+                <td>82.37</td>
+                <td>74.73</td>
+                <td>0.9580</td>
+                <td>0.9492</td>
+                <td>0.9864</td>
+                <td class="cell-best">0.9887</td>
+                <td class="cell-second">0.7407</td>
+                <td>0.5931</td>
+              </tr>
+              <tr data-group="two">
+                <td>DMD</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td>83.97</td>
+                <td>84.12</td>
+                <td class="cell-best">83.36</td>
+                <td class="cell-best">0.9732</td>
+                <td class="cell-best">0.9722</td>
+                <td class="cell-best">0.9913</td>
+                <td class="cell-second">0.9871</td>
+                <td>0.4444</td>
+                <td class="cell-best">0.6602</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>SMD + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-best">84.33</td>
+                <td class="cell-best">85.26</td>
+                <td>80.58</td>
+                <td>0.9587</td>
+                <td>0.9487</td>
+                <td>0.9779</td>
+                <td>0.9841</td>
+                <td class="cell-best">0.8417</td>
+                <td>0.6488</td>
+              </tr>
+              <tr data-group="ours" class="is-ours">
+                <td>DMD + StepBridge</td>
+                <td><span class="nfe nfe--2">2</span></td>
+                <td class="cell-second">84.26</td>
+                <td class="cell-second">84.77</td>
+                <td class="cell-second">82.23</td>
+                <td class="cell-second">0.9710</td>
+                <td class="cell-second">0.9675</td>
+                <td>0.9894</td>
+                <td>0.9852</td>
+                <td>0.5278</td>
+                <td class="cell-second">0.6584</td>
+              </tr>
+            </tbody>
+            </table>
+          </div>
+          <p class="table-caption">Supplementary Table S3. The same recipe on Wan2.1-T2V-14B. SMD recovers 94.3% of its gap (80.84 &rarr; 84.33) and DMD 60.4% (83.97 &rarr; 84.26); both two-step StepBridge students land closest to their four-step references.</p>
+        </div>
+
+        <div class="table-legend">
+          <span class="legend-key"><span class="key key--best"></span>Best</span>
+          <span class="legend-key"><span class="key key--second"></span>Second</span>
+          <span class="legend-key"><span class="key key--third"></span>Third</span>
+          <span class="scroll-hint">Scroll horizontally &rarr;</span>
+          <span class="note">Highlighting is computed among NFE = 2 methods. &plusmn; is the standard deviation over five seeds.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== QUALITATIVE ============================== -->
+  <section id="qualitative">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">05</span> Qualitative results</div>
+        <h2 class="section-title">Detail survives the compression.</h2>
+        <p class="section-lede">Fine structure is the first casualty of aggressive step reduction. Across methods and prompts, the anchored student keeps arches connected, textures resolved, and subjects recognizable.</p>
+      </div>
+
+      <div class="fig-stack">
+        <figure class="figure reveal">
+          <div class="figure__media" data-zoom="assets/figures/fig3.webp" data-caption="Qualitative comparison of four-step SMD, two-step SMD, and two-step StepBridge. Red boxes mark local regions for comparison.">
+            <img src="assets/figures/fig3.webp" width="1961" height="1123" loading="lazy" alt="Four-step SMD versus two-step SMD versus two-step StepBridge, with zoomed regions.">
+            <span class="zoom-hint">Click to enlarge</span>
+          </div>
+          <figcaption><b>Figure 3 &middot; Same prompt, three budgets.</b> Comparing four-step SMD, its original two-step student, and two-step StepBridge. Red boxes mark the local regions where two-step sampling tends to lose structure.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure__media" data-zoom="assets/figures/fig4.webp" data-caption="Qualitative comparison across DMD, DMD2, rCM, and AnyFlow on three prompts, with StepBridge-enhanced DMD and DMD2.">
+            <img src="assets/figures/fig4.webp" width="1992" height="817" loading="lazy" alt="Cross-paradigm qualitative comparison on elephant, giraffe, and motorcycle prompts.">
+            <span class="zoom-hint">Click to enlarge</span>
+          </div>
+          <figcaption><b>Figure 4 &middot; Across paradigms.</b> DMD, DMD2, rCM, AnyFlow, and the StepBridge-enhanced DMD / DMD2 students on three prompts. Each column fixes the prompt; each row is a different distillation objective at two steps.</figcaption>
+        </figure>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== ANALYSIS ============================== -->
+  <section id="analysis">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">06</span> Analysis</div>
+        <h2 class="section-title">Where the gain comes from.</h2>
+        <p class="section-lede">Each component earns its place. Removing the coordination step is worse than removing a whole objective; adding the interval-averaged target and projection recovers the conflict and pushes past every ablation.</p>
+      </div>
+
+      <div class="table-card reveal">
+          <div class="table-toolbar">
+            <span class="table-toolbar__title">Ablation &mdash; SMD-based two-step student</span>
+          </div>
+          <div class="table-scroll">
+            <table class="data ablation-table">
+              <thead>
+                <tr>
+                  <th>Variant</th>
+                  <th>OPD</th>
+                  <th>DMD</th>
+                  <th>As.G.</th>
+                  <th>As.P.</th>
+                  <th>Int.V.</th>
+                  <th>Total &uarr;</th>
+                  <th>Qual. &uarr;</th>
+                  <th>Sem. &uarr;</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OPD only</td>
+                  <td>&#10003;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td>
+                  <td>78.25</td><td>79.97</td><td>71.35</td>
+                </tr>
+                <tr>
+                  <td>Anchor-DMD</td>
+                  <td>&ndash;</td><td>&#10003;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td>
+                  <td>82.40</td><td>83.84</td><td>76.60</td>
+                </tr>
+                <tr>
+                  <td>Joint objectives</td>
+                  <td>&#10003;</td><td>&#10003;</td><td>&ndash;</td><td>&ndash;</td><td>&ndash;</td>
+                  <td style="color:var(--warm);font-weight:700">81.04</td><td>82.96</td><td>73.33</td>
+                </tr>
+                <tr>
+                  <td>+ Adaptive scaling</td>
+                  <td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&ndash;</td><td>&ndash;</td>
+                  <td>82.59</td><td>83.75</td><td>77.94</td>
+                </tr>
+                <tr>
+                  <td>Point-velocity sup.</td>
+                  <td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&ndash;</td>
+                  <td>82.77</td><td>83.96</td><td>78.01</td>
+                </tr>
+                <tr class="is-ours">
+                  <td>Full StepBridge</td>
+                  <td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td><td>&#10003;</td>
+                  <td>83.17</td><td>84.60</td><td>77.43</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-legend">
+            <span class="note">As.G. adaptive gradient scaling &middot; As.P. asymmetric projection &middot; Int.V. interval-averaged velocity.</span>
+          </div>
+      </div>
+
+      <div class="analysis-grid analysis-grid--ladder">
+        <div class="ladder reveal">
+          <h3>VBench Total along the ablation ladder</h3>
+          <p class="ladder__sub">Adding both objectives naively <em>lowers</em> the score. Coordination is what makes the combination work.</p>
+          <div class="ladder__rows">
+            <div class="ladder__row">
+              <span class="ladder__label">OPD only</span>
+              <span class="ladder__track"><span class="ladder__fill" style="width:12.5%"></span></span>
+              <span class="ladder__val">78.25</span>
+            </div>
+            <div class="ladder__row">
+              <span class="ladder__label">Anchor-DMD</span>
+              <span class="ladder__track"><span class="ladder__fill" style="width:81.7%"></span></span>
+              <span class="ladder__val">82.40</span>
+            </div>
+            <div class="ladder__row ladder__row--joint">
+              <span class="ladder__label">Joint objectives</span>
+              <span class="ladder__track"><span class="ladder__fill" style="width:59%"></span></span>
+              <span class="ladder__val">81.04</span>
+            </div>
+            <div class="ladder__row">
+              <span class="ladder__label">+ Adaptive scaling</span>
+              <span class="ladder__track"><span class="ladder__fill" style="width:84.8%"></span></span>
+              <span class="ladder__val">82.59</span>
+            </div>
+            <div class="ladder__row">
+              <span class="ladder__label">Point-velocity sup.</span>
+              <span class="ladder__track"><span class="ladder__fill" style="width:87.8%"></span></span>
+              <span class="ladder__val">82.77</span>
+            </div>
+            <div class="ladder__row is-full">
+              <span class="ladder__label">Full StepBridge</span>
+              <span class="ladder__track"><span class="ladder__fill ladder__fill--warm" style="width:94.5%"></span></span>
+              <span class="ladder__val">83.17</span>
+            </div>
+          </div>
+          <p class="ladder__insight">
+            The naive combination loses <b>1.36 points</b> relative to anchor-only. Coordination more than recovers
+            it, and interval-averaged velocity adds the final <b>+0.40</b> over point-velocity supervision.
+          </p>
+        </div>
+
+        <div class="pullquote reveal">
+          <div class="pullquote__k">107.3&deg;</div>
+          <p>The OPD and DMD gradients are not merely imbalanced &mdash; at the measured probe they point
+            <b>107.3 degrees apart</b>. Asymmetric projection strips the opposing component while keeping the
+            aligned one, so the update still follows the trajectory objective.</p>
+          <div class="pullquote__foot">Gradient geometry &middot; Fig. 5(b)</div>
+        </div>
+      </div>
+
+      <div class="analysis-grid">
+        <div class="panel takeaways reveal">
+          <h3>Reading the results</h3>
+          <ul class="takeaways__list">
+            <li><b>Anchoring transfers.</b> SMD, DMD, and DMD2 all improve at two steps, including a method that already performs distribution matching.</li>
+            <li><b>Diversity is not sacrificed.</b> Cross-seed LPIPS rises for all three students while subject and background consistency stay comparable or improve.</li>
+            <li><b>No inference tax.</b> The deployed model keeps two DiT evaluations, 1.84&thinsp;s, and 18.4&thinsp;GB &mdash; exactly the base student's path.</li>
+          </ul>
+          <p class="takeaways__foot">14B results in the appendix follow the same pattern: SMD 80.84 &rarr; 84.33, DMD 83.97 &rarr; 84.26.</p>
+        </div>
+
+        <div class="table-card reveal">
+          <div class="table-toolbar">
+            <span class="table-toolbar__title">Diversity &amp; temporal consistency</span>
+          </div>
+          <div class="table-scroll">
+            <table class="mini-table">
+              <thead>
+                <tr>
+                  <th>Method</th><th>LPIPS &uarr;</th><th>Subj. cons. &uarr;</th><th>Bg. cons. &uarr;</th><th>Flicker &darr;</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>SMD</td><td>0.636</td><td>0.9593</td><td>0.9556</td><td>0.0069</td></tr>
+                <tr><td>DMD</td><td>0.632</td><td>0.9559</td><td>0.9544</td><td>0.0195</td></tr>
+                <tr><td>DMD2</td><td>0.624</td><td>0.9672</td><td>0.9583</td><td>0.0049</td></tr>
+                <tr><td>rCM</td><td>0.655</td><td>0.9527</td><td>0.9552</td><td>0.0085</td></tr>
+                <tr><td>AnyFlow</td><td>0.603</td><td>0.9756</td><td>0.9656</td><td>0.0077</td></tr>
+                <tr class="is-ours"><td>SMD +</td><td>0.686</td><td>0.9626</td><td>0.9597</td><td>0.0070</td></tr>
+                <tr class="is-ours"><td>DMD +</td><td>0.641</td><td>0.9584</td><td>0.9548</td><td>0.0232</td></tr>
+                <tr class="is-ours"><td>DMD2 +</td><td>0.630</td><td>0.9607</td><td>0.9577</td><td>0.0088</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-legend">
+            <span class="note">&ldquo;+&rdquo; denotes StepBridge. LPIPS is cross-seed diversity.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="eff-grid">
+        <div class="eff reveal">
+          <div class="eff__head"><span>50-step teacher</span><span class="nfe">100 DiT evals</span></div>
+          <div class="eff__num">95.0<small>s</small></div>
+          <div class="eff__bar"><span style="width:100%"></span></div>
+          <div class="eff__meta">40.3 GB peak memory</div>
+        </div>
+        <div class="eff reveal">
+          <div class="eff__head"><span>Four-step SMD</span><span class="nfe">4 DiT evals</span></div>
+          <div class="eff__num">3.78<small>s</small></div>
+          <div class="eff__bar"><span style="width:4%"></span></div>
+          <div class="eff__meta">21.0 GB peak memory &middot; &times;25 faster than the teacher</div>
+        </div>
+        <div class="eff eff--ours reveal">
+          <div class="eff__head"><span>StepBridge (2-step)</span><span class="nfe nfe--2">2 DiT evals</span></div>
+          <div class="eff__num">1.84<small>s</small></div>
+          <div class="eff__bar"><span style="width:1.9%"></span></div>
+          <div class="eff__meta">18.4 GB peak memory &middot; 51&times; faster than the teacher</div>
+        </div>
+      </div>
+
+      <div class="note-strip reveal" style="margin-top:28px">
+        <span><b>14B backbone.</b> The same recipe transfers: SMD + StepBridge reaches 84.33 Total (from 80.84) and DMD + StepBridge 84.26 (from 83.97).</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== CITATION ============================== -->
+  <section id="citation">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="eyebrow"><span class="eyebrow__num">07</span> Citation</div>
+        <h2 class="section-title">Build on it.</h2>
+        <p class="section-lede">If StepBridge is useful for your work, please cite the paper. Author and venue details will be updated for the camera-ready version.</p>
+      </div>
+
+      <div class="citation-card reveal">
+        <div class="citation-card__head">
+          <span>BibTeX</span>
+          <button class="copy-btn" id="copyBib" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            <span>Copy</span>
+          </button>
+        </div>
+        <pre id="bibtex"><span class="k">@misc</span>{stepbridge2027,
+  title        = {Unifying Trajectory and Distribution Supervision
+                  for Efficient Two-Step Diffusion Generation},
+  author       = {Zhijun Song and Yinbo Liu and Peng Zhang and Yang Zhou
+                  and Fei Wang and Daiguo Zhou and Jian Luan},
+  year         = {2027},
+  howpublished = {\url{https://visualgenmi.github.io/StepBridge-Page/}}
+}</pre>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="brand__mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round">
+            <path d="M3 18V9M21 18V9"/>
+            <path d="M3 12c3-4.5 6-4.5 9 0s6 4.5 9 0"/>
+            <path d="M3 18h18"/>
+            <path d="M7 18v-3.2M12 18v-2.4M17 18v-3.2"/>
+          </svg>
+        </span>
+        <p><b>StepBridge</b><br>Trajectory &times; distribution supervision for two-step generation.</p>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a href="#abstract">Abstract</a>
+        <a href="#method">Method</a>
+        <a href="#results">Results</a>
+        <a href="#videos">Videos</a>
+        <a href="#analysis">Analysis</a>
+        <a href="assets/pdf/StepBridge-paper.pdf" target="_blank" rel="noopener">Paper</a>
+      </nav>
+    </div>
+    <div class="footer-meta">
+      <span>&copy; 2027 StepBridge authors.</span>
+      <span>Figures rendered from the paper &middot; videos generated at 2 NFE.</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================== LIGHTBOX ============================== -->
+<dialog class="lightbox" id="lightbox" aria-label="Media viewer">
+  <div class="lightbox__body">
+    <div class="lightbox__head">
+      <div>
+        <div class="lightbox__title" id="lbTitle"></div>
+        <div class="lightbox__sub" id="lbSub"></div>
+      </div>
+      <button class="lightbox__close" id="lbClose" type="button" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="lightbox__media" id="lbMedia"></div>
+    <div class="lightbox__caption" id="lbCaption"></div>
+  </div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+  <span id="toastText">Copied</span>
+</div>
+
+<button class="icon-btn" id="toTop" type="button" aria-label="Back to top" title="Back to top" style="position:fixed;right:22px;bottom:22px;z-index:90;opacity:0;pointer-events:none;transition:opacity .25s ease,transform .25s ease;transform:translateY(8px);box-shadow:var(--shadow-md)">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script type="application/json" id="videoData">
+[
+  {
+    "video": "assets/videos/1.3B.SMD.orange_cat_among_pink_flowers.vs.StepBridge.mp4",
+    "poster": "assets/posters/1.3B.SMD.orange_cat_among_pink_flowers.vs.StepBridge.jpg",
+    "title": "Orange cat among pink flowers",
+    "model": "1.3B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.steam_train_on_stone_arch_viaduct.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.steam_train_on_stone_arch_viaduct.vs.StepBridge.jpg",
+    "title": "Steam train on a stone-arch viaduct",
+    "model": "14B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.dragon_breathing_fire_over_city.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.dragon_breathing_fire_over_city.vs.StepBridge.jpg",
+    "title": "Dragon breathing fire over a city",
+    "model": "14B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.DMD.white_church_on_seaside_cliff.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.DMD.white_church_on_seaside_cliff.vs.StepBridge.jpg",
+    "title": "White church on a seaside cliff",
+    "model": "14B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/1.3B.SMD.white_suv_on_forest_dirt_road.vs.StepBridge.mp4",
+    "poster": "assets/posters/1.3B.SMD.white_suv_on_forest_dirt_road.vs.StepBridge.jpg",
+    "title": "White SUV on a forest dirt road",
+    "model": "1.3B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.DMD.steam_train_on_green_valley_viaduct.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.DMD.steam_train_on_green_valley_viaduct.vs.StepBridge.jpg",
+    "title": "Steam train on a green-valley viaduct",
+    "model": "14B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/1.3B.DMD.orange_cat_walking_in_flower_garden.vs.StepBridge.mp4",
+    "poster": "assets/posters/1.3B.DMD.orange_cat_walking_in_flower_garden.vs.StepBridge.jpg",
+    "title": "Orange cat walking in a flower garden",
+    "model": "1.3B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.aerial_coastal_cliffs_and_turquoise_bay.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.aerial_coastal_cliffs_and_turquoise_bay.vs.StepBridge.jpg",
+    "title": "Aerial coastal cliffs and turquoise bay",
+    "model": "14B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/1.3B.SMD.old_man_with_beret_in_street_crowd.vs.StepBridge.mp4",
+    "poster": "assets/posters/1.3B.SMD.old_man_with_beret_in_street_crowd.vs.StepBridge.jpg",
+    "title": "Old man with a beret in a street crowd",
+    "model": "1.3B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.DMD.fire_dragon_over_skyscrapers.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.DMD.fire_dragon_over_skyscrapers.vs.StepBridge.jpg",
+    "title": "Fire dragon over skyscrapers",
+    "model": "14B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/1.3B.DMD.train_crossing_stone_viaduct.vs.StepBridge.mp4",
+    "poster": "assets/posters/1.3B.DMD.train_crossing_stone_viaduct.vs.StepBridge.jpg",
+    "title": "Train crossing a stone viaduct",
+    "model": "1.3B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.octopus_and_lobster_on_seabed.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.octopus_and_lobster_on_seabed.vs.StepBridge.jpg",
+    "title": "Octopus and lobster on the seabed",
+    "model": "14B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.orange_cat_in_flower_garden.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.orange_cat_in_flower_garden.vs.StepBridge.jpg",
+    "title": "Orange cat in a flower garden",
+    "model": "14B",
+    "method": "SMD"
+  },
+  {
+    "video": "assets/videos/14B.DMD.otter_surfing_in_life_jacket.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.DMD.otter_surfing_in_life_jacket.vs.StepBridge.jpg",
+    "title": "Otter surfing in a life jacket",
+    "model": "14B",
+    "method": "DMD"
+  },
+  {
+    "video": "assets/videos/14B.SMD.white_suv_on_mountain_forest_road.vs.StepBridge.mp4",
+    "poster": "assets/posters/14B.SMD.white_suv_on_mountain_forest_road.vs.StepBridge.jpg",
+    "title": "White SUV on a mountain forest road",
+    "model": "14B",
+    "method": "SMD"
+  }
+]
+</script>
+<script src="assets/js/main.js?v=2"></script>
+<script src="assets/js/cinema.js?v=2"></script>
+<script src="assets/js/steps3d.js?v=2"></script>
+<script src="assets/js/arch3d.js?v=2"></script>
+</body>
+</html>

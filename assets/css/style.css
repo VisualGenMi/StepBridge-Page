@@ -408,6 +408,18 @@ a.icon-btn {
   height: 18px;
 }
 
+/* The GitHub mark is a filled silhouette rather than a 1.8 px stroke, so at the
+   same box it reads heavier than the stroked theme icon next to it. A slightly
+   smaller box evens out the optical weight. */
+.icon-btn .icon-github {
+  width: 17px;
+  height: 17px;
+}
+
+.icon-btn--github:hover {
+  color: var(--ink);
+}
+
 [data-theme="light"] .icon-sun,
 [data-theme="dark"] .icon-moon {
   display: none;

@@ -205,7 +205,7 @@ most often.
 
 | Content | Where |
 | --- | --- |
-| Authors and affiliations | `.authors`, `.affil`, `.authors__note` (the `*` / `†` legend) |
+| Authors and affiliations | `.authors`, `.affil`, `.authors__note` (the `*` equal contribution / `†` corresponding author / `‡` project leader legend) |
 | Title, subtitle, tagline | `.hero__lockup`, `h1`, `.hero__sub`, `.hero__tagline` |
 | Call-to-action buttons | `.cta-row` — swap the `Paper` placeholder for a real `href` once a public PDF exists |
 | Abstract text | `.abstract-text` inside `#abstract` |

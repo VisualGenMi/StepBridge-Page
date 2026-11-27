@@ -4,21 +4,19 @@
    ========================================================================== */
 
 :root {
-  /* The page is designed at a comfortable 1320 px column. On large screens that
-     column leaves a lot of empty air and every element reads oversized, so the
-     whole document is laid out a little smaller by default.
+  /* ---- scale knob ----------------------------------------------------------
+     Everything below is laid out at 1.0 by default. When a large display makes
+     the page feel oversized, one value changes it -- either here, or for a
+     single visit with ?zoom=0.67 in the URL (see the inline script in
+     index.html). Accepts anything from 0.4 to 1.5.
 
      `zoom` is used rather than `transform: scale()` because zoom scales the
-     layout too: a transform would shrink the picture but leave the page's
-     scroll box at full size, producing a band of empty space and a wrong
-     scrollbar. Media queries still see the real viewport, which is what keeps
-     the breakpoints below behaving.
-
-     Two places need to compensate for this value:
-       · the canvas renderers read it and divide their device-pixel ratio by it,
-         otherwise the 3D figures are drawn too small and look soft;
-       · the lightbox heights divide their vh by it (see the lightbox rules).
-     Keep --ui-zoom at 1 on phones: at that size the page is already dense. */
+     layout box too: a transform would shrink the picture but leave the scroll
+     extent at full size, producing a band of empty space and a wrong scrollbar.
+     Two places compensate for a non-1 value:
+       · both 3D canvases divide their device-pixel ratio by it, otherwise the
+         figures are drawn too small and look soft;
+       · the lightbox heights divide their vh by it.                              */
   --ui-zoom: 1;
 
   --paper: #faf8f4;
@@ -99,23 +97,6 @@ html {
   scroll-padding-top: 92px;
   -webkit-text-size-adjust: 100%;
   zoom: var(--ui-zoom);
-}
-
-/* Two steps, not a ladder. Measured against the hero: the vertical composition
-   depends only on this value (the column is capped at 1320 px and the type
-   saturates), so the numbers below were picked from actual measurements --
-     zoom 1.00 -> CTA row ends at 70 % of a 1000 px viewport, the video wall
-                  starts at 75 %: only a sliver of the wall is visible
-     zoom 0.67 -> CTA row ends at 47 %, the wall starts at 50 %: the whole wall
-                  and the key numbers fit above the fold
-   Wide screens get the full reduction; laptops keep larger type for the
-   long-form abstract; phones stay at 1. */
-@media (min-width: 1600px) {
-  :root { --ui-zoom: 0.67; }
-}
-
-@media (min-width: 1200px) and (max-width: 1599px) {
-  :root { --ui-zoom: 0.75; }
 }
 
 body {

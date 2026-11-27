@@ -474,15 +474,26 @@ white and left the light body text unreadable.
   a raw image.
 - **Both 3D canvases** use palette-independent colours, so switching themes
   needs no re-render logic.
-- **Default scale.** The whole document is laid out with CSS `zoom`, driven by
-  `--ui-zoom` in `style.css`: `0.67` above 1600 px, `0.75` from 1200 to 1599,
-  `1` below that. Measured against the hero, the vertical composition depends
-  only on this value — at zoom `1` the CTA row ends at 70 % of a 1000 px
-  viewport and the video wall starts at 75 %, so only a sliver of the wall is
-  visible; at `0.67` the wall starts at 50 % and the whole thing fits above the
-  fold. `zoom` is used rather than `transform: scale()` because it scales the
-  layout too, and both 3D canvases divide their device-pixel ratio by the same
-  value so the figures stay sharp.
+- **Default scale is 1.0.** A single knob, `--ui-zoom` in `style.css`, drives a
+  CSS `zoom` on `<html>`; it exists so a projector or a large display can shrink
+  the whole document without touching a single rule. Change that one value to
+  `0.72` and the entire page — layout, type, figures — scales together.
+
+  For a one-off, append `?zoom=` instead of editing anything:
+
+  | URL | Effect |
+  | --- | --- |
+  | `?zoom=0.67` | scales this visit only |
+  | `?zoom=67` | same, percent form |
+  | `?zoom=abc` / `?zoom=9` | ignored, falls back to 1.0 |
+
+  `zoom` is used rather than `transform: scale()` because zoom scales the layout
+  box too; a transform would shrink the picture but leave the scroll extent at
+  full size, giving a band of empty space and a wrong scrollbar. Two places
+  compensate for a non-1 value: both 3D canvases divide their device-pixel ratio
+  by it (so the figures stay sharp rather than soft), and the lightbox heights
+  divide their `vh` by it.
+
 - **Initial paint** loads fonts plus a single image; videos and posters are lazy
   and only start when the wall scrolls into view.
 - **The comparison wall and both canvases** are `IntersectionObserver`-driven:

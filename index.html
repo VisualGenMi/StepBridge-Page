@@ -37,6 +37,20 @@
       document.documentElement.dataset.theme = t;
       document.querySelector('meta[name="theme-color"]').setAttribute("content", t === "dark" ? "#0a0f1c" : "#faf8f4");
     } catch (e) {}
+
+    // Optional scale override for one visit: ?zoom=0.67 (or ?zoom=67).
+    // Handy for a projector, a 4K capture, or a screenshot that needs to fit
+    // more of the page. Anything implausible is ignored on purpose.
+    try {
+      var z = new URLSearchParams(location.search).get("zoom");
+      if (z) {
+        var v = parseFloat(z);
+        if (v > 2) v = v / 100;
+        if (v >= 0.4 && v <= 1.5) {
+          document.documentElement.style.setProperty("--ui-zoom", String(v));
+        }
+      }
+    } catch (e) {}
   })();
 </script>
 </head>

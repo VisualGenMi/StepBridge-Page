@@ -26,35 +26,10 @@
 
 ## Table of contents
 
-<table width="100%">
-<tr>
-<td valign="top" width="50%">
-
-**Getting started**
-- [What this is](#what-this-is)
-- [Quick start](#quick-start)
-- [Deep links](#deep-links-for-screenshots)
-
-**Ship it**
-- [Deployment](#deployment)
-- [Adding collaborators](#adding-collaborators)
-
-</td>
-<td valign="top" width="50%">
-
-**Work on it**
-- [Repository layout](#repository-layout)
-- [What to edit](#what-to-edit)
-- [Rebuilding assets](#rebuilding-assets)
-
-**Understand it**
-- [Design notes](#design-notes)
-- [Automated checks](#automated-checks)
-- [Credits](#credits)
-
-</td>
-</tr>
-</table>
+- **Getting started** — [What this is](#what-this-is) · [Quick start](#quick-start) · [Deep links](#deep-links-for-screenshots)
+- **Ship it** — [Deployment](#deployment) · [Adding collaborators](#adding-collaborators)
+- **Work on it** — [Repository layout](#repository-layout) · [What to edit](#what-to-edit) · [Rebuilding assets](#rebuilding-assets)
+- **Understand it** — [Design notes](#design-notes) · [Automated checks](#automated-checks) · [Credits](#credits)
 
 ---
 
@@ -382,7 +357,7 @@ floating them on black.
 <table width="100%">
 <tr>
 <td width="52%" valign="top">
-  <img src="docs/abstract.webp" alt="Abstract reading-guide flowchart">
+  <img src="docs/abstract.webp" width="470" alt="Abstract reading-guide flowchart">
 </td>
 <td width="48%" valign="top">
 
@@ -414,7 +389,7 @@ abstract, so readers see the diagram before the text.
 ### 🏅 The emblem
 
 <p align="center">
-  <img src="docs/logo.svg" width="88" alt="StepBridge emblem">
+  <img src="docs/logo.svg" width="96" alt="StepBridge emblem">
 </p>
 
 One sentence: **a rise plus a flat run = two steps; a dashed chord = endpoint
@@ -462,10 +437,10 @@ Implementation: inline SVG on a 120 × 120 grid, ring text laid out with
 <table width="100%">
 <tr>
 <td width="50%" valign="top">
-  <img src="docs/results.webp" alt="Results section">
+  <img src="docs/results.webp" width="450" alt="Results section">
 </td>
 <td width="50%" valign="top">
-  <img src="docs/analysis.webp" alt="Analysis section">
+  <img src="docs/analysis.webp" width="450" alt="Analysis section">
 </td>
 </tr>
 </table>

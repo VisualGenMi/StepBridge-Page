@@ -26,7 +26,7 @@
 
 ## Table of contents
 
-<table>
+<table width="100%">
 <tr>
 <td valign="top" width="50%">
 
@@ -64,7 +64,7 @@ A project page for a paper on two-step video diffusion. It is one static HTML
 file plus hand-written CSS and JavaScript, with two custom 3D figures drawn
 directly into `<canvas>` and a fifteen-clip comparison wall in the hero.
 
-<table>
+<table width="100%">
 <tr>
 <td width="33%" valign="top">
 
@@ -88,7 +88,7 @@ No `npm install`, no build step, no framework. Edit the file, refresh.
 </tr>
 </table>
 
-<table>
+<table width="100%">
 <tr>
 <td width="50%">
 
@@ -313,7 +313,7 @@ the old bytes. `cinema.js` appends `?v=…` to video and poster URLs, and
 Both figures are drawn by hand into a `<canvas>` with a small perspective
 projection, `s = focal / (dist − z)`. There is no WebGL and no 3D library.
 
-<table>
+<table width="100%">
 <tr>
 <td width="50%" valign="top">
 
@@ -379,7 +379,7 @@ floating them on black.
 
 ### 🧭 The abstract flowchart
 
-<table>
+<table width="100%">
 <tr>
 <td width="52%" valign="top">
   <img src="docs/abstract.webp" alt="Abstract reading-guide flowchart">
@@ -459,7 +459,7 @@ Implementation: inline SVG on a 120 × 120 grid, ring text laid out with
 
 ### 📊 Results and analysis
 
-<table>
+<table width="100%">
 <tr>
 <td width="50%" valign="top">
   <img src="docs/results.webp" alt="Results section">

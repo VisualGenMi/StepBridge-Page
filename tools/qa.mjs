@@ -255,7 +255,7 @@ const localAssets = await evaluate(`JSON.stringify([...new Set([
   ...Array.from(document.images).map(i => i.getAttribute('src')),
   ...Array.from(document.querySelectorAll('video')).map(v => v.getAttribute('data-src')),
   ...Array.from(document.querySelectorAll('video[poster]')).map(v => v.getAttribute('poster')),
-  'assets/css/style.css', 'assets/js/main.js', 'assets/pdf/StepBridge-paper.pdf'
+  'assets/css/style.css', 'assets/js/main.js', 'assets/og.png', 'assets/favicon.svg'
 ].filter(Boolean))])`);
 let badAssets = [];
 for (const asset of JSON.parse(localAssets)) {

@@ -108,7 +108,7 @@ Pages 会在 push 后自动重新发布，1 分钟内生效。
 | 内容 | 位置 |
 | --- | --- |
 | 作者与单位 | `<div class="authors">`、`.affil`、`.authors__note`（* / † 说明） |
-| 论文 PDF | `assets/pdf/StepBridge-paper.pdf` |
+| 论文 PDF | 暂不发布（当前只有匿名审稿版）；有正式版后放回 `assets/pdf/` 并把 `Paper` 按钮改回链接 |
 | arXiv / Code 链接 | hero 的 `.cta-row`（把 `Code` 的 `<span>` 换成 `<a>`） |
 | BibTeX | `id="bibtex"` 的 `<pre>` |
 | 社交预览图 | `assets/og.png`（1200×630）+ `<meta property="og:image">`，部署后建议写完整 URL |
@@ -306,7 +306,7 @@ python tools/make_og.py           # 社交预览
   在深色页面里读起来像贴上去的一张纸，而不是突兀的色块。
 - “Optimization, in four lines” 公式卡在两种主题下都保持深色，保证对比度。
 - 页面总计约 108 MB（视频 50 MB、PDF 56 MB）；首屏只加载字体 + 一张图。
-  若在意仓库体积，可删 `assets/pdf/`，Paper 按钮改指 arXiv。
+  `assets/pdf/` 已加入 `.gitignore`：审稿版 PDF 每页印有 confidential 页眉，不进公开仓库。
 
 ## 9. 内容来源
 

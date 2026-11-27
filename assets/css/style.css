@@ -2806,6 +2806,10 @@ table.data tr.group-start td {
 
 /* authors: equal contribution / project leader */
 
+.mark + .mark {
+  margin-left: 3.5px;
+}
+
 .mark {
   margin-left: 1px;
   font-size: 0.72em;
